@@ -1,3 +1,4 @@
+
 <?php
 
 /*
@@ -37,6 +38,7 @@ Route::get('/admin/view-categories', 'CategoryController@viewCategories')->middl
 
 // Product Routes
 Route::match(['get', 'post'], '/admin/add-product', 'ProductController@addProduct')->middleware('auth');
+// The reason we can have # is because it leads to this route
 Route::match(['get', 'post'], '/admin/edit-product/{id}', 'ProductController@editProduct')->middleware('auth');
 Route::get('/admin/view-products', 'ProductController@viewProducts')->middleware('auth');
 Route::get('/admin/delete-product/{id}', 'ProductController@deleteProduct')->middleware('auth');
