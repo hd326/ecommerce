@@ -11,11 +11,17 @@ class CategoryController extends Controller
     {
         // this could be index to follow REST
         if($request->isMethod('post')) {
+            if(empty($request->status)){
+                $status = 0;
+            } else {
+                $status = 1;
+            }
             $category = new Category();
             $category->name = $request->category_name;
             $category->parent_id = $request->parent_id;
             $category->description = $request->description;
             $category->url = $request->url;
+            $category->status = $status;
             $category->save();
             return redirect('/admin/view-categories')->with('flash_message_success', 'Category added Successfully!');
         }
@@ -27,10 +33,16 @@ class CategoryController extends Controller
     public function editCategory(Request $request, $id = null)
     {
         if($request->isMethod('post')){
+            if(empty($request->status)){
+                $status = 0;
+            } else {
+                $status = 1;
+            }
             Category::where('id', $id)->update([
                 'name' => $request->category_name,
                 'description' => $request->description,
-                'url' => $request->url
+                'url' => $request->url,
+                'status' => $status
             ]);
             return redirect('/admin/view-categories')->with('flash_message_success', 'Category updated Successfully!');
         }

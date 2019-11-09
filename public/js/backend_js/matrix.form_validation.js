@@ -211,6 +211,13 @@ $(document).ready(function(){
 		return false;
 	});
 
+	$('#delAttribute').click(function(){
+		if(confirm('Are you sure you want to delete this Attribute?')){
+			return true;
+		}
+		return false;
+	});
+
 	//$(".deleteRecord").click(function(){
 	//	var id = $(this).attr('rel');
 	//	var deleteRoute = $(this).attr('rel1');

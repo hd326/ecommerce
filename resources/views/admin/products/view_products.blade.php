@@ -24,7 +24,6 @@
         <hr>
         <div class="row-fluid">
             <div class="span12">
-
                 <div class="widget-box">
                     <div class="widget-title"> <span class="icon"><i class="icon-th"></i></span>
                         <h5>View Products</h5>
@@ -62,15 +61,16 @@
                                     </td>
                                     <td class="center">
                                         <a href="#myModal{{ $product->id }}" data-toggle="modal"
-                                            class="btn btn-success btn-mini">View</a>
+                                            class="btn btn-success btn-mini" title="View Product">View</a>
                                         <a href="{{ url('/admin/edit-product/' . $product->id) }}"
-                                            class="btn btn-primary btn-mini">Edit</a>
-                                            <a href="{{ url('/admin/add-attributes/' . $product->id) }}"
-                                                class="btn btn-success btn-mini">Add</a>
-                                        <a rel="{{ $product->id }}" rel1="delete-product" <?php /* href="{{ url('/admin/delete-product/' . $product->id) }}" */ ?>
-                                            href="javascript:"
-                                            class="btn btn-danger btn-mini deleteRecord">Delete</a>
-                                        </td>
+                                            class="btn btn-primary btn-mini" title="Edit Product">Edit</a>
+                                        <a href="{{ url('/admin/add-attributes/' . $product->id) }}"
+                                            class="btn btn-success btn-mini" title="Add Attributes">Add</a>
+                                        <a href="{{ url('/admin/add-images/' . $product->id) }}"
+                                            class="btn btn-info btn-mini" title="Add Images">Add</a>    
+                                        <a id="delProduct" href="{{ url('/admin/delete-product/' . $product->id) }}"
+                                            class="btn btn-danger btn-mini" title="Delete Product">Delete</a>
+                                    </td>
                                 </tr>
                                 <div id="myModal{{ $product->id }}" class="modal hide">
                                     <div class="modal-header">
