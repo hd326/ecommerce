@@ -97,7 +97,7 @@
                                     <td>{{ $attribute->price }}</td>
                                     <td>{{ $attribute->stock }}</td>
                                     <td class="center">
-                                        <a id="delAttribute" href="{{ url('/admin/delete-attribute/'. $attribute->id) }}" class="btn btn-danger btn-mini deleteRecord">Delete</a>
+                                        <a id="delAttribute" href="{{ url('/admin/delete-attribute/'. $attribute->id) }}" class="btn btn-danger btn-mini">Delete</a>
                                     </td>
                                 </tr>
                                 @endforeach
