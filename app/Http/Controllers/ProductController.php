@@ -369,6 +369,8 @@ class ProductController extends Controller
 
     public function addtocart(Request $request)
     {
+        Session::forget('CouponAmount');
+        Session::forget('CouponCode');
 
         if(empty($request->user_email)){
             $request->user_email = '';
@@ -420,6 +422,7 @@ class ProductController extends Controller
 
     public function cart()
     {
+
         $session_id = Session::get('session_id');
         $userCart = DB::table('cart')->where('session_id', $session_id)->get();
         foreach($userCart as $key => $product){
@@ -431,12 +434,18 @@ class ProductController extends Controller
 
     public function deleteCartProduct($id = null)
     {
+        Session::forget('CouponAmount');
+        Session::forget('CouponCode');
+
         DB::table('cart')->where('id', $id)->delete();
         return redirect('cart')->with('flash_message_success', 'Product has been deleted from Cart!');
     }
 
     public function updateCartQuantity($id = null, $quantity = null)
     {
+        Session::forget('CouponAmount');
+        Session::forget('CouponCode');
+
         $getCartDetails = DB::table('cart')->where('id', $id)->first();
         // Get our Cart details to compare
         $getAttributeStock = ProductsAttribute::where('sku', $getCartDetails->product_code)->first();
