@@ -13,7 +13,9 @@ class CategoryController extends Controller
         if($request->isMethod('post')) {
             if(empty($request->status)){
                 $status = 0;
+                // if there is no status, 0
             } else {
+                // if there is a status, 1
                 $status = 1;
             }
             $category = new Category();

@@ -11,6 +11,7 @@ use Auth;
 use Session;
 use Illuminate\Support\Facades\Input;
 use Image;
+use DB;
 
 class ProductController extends Controller
 {
@@ -59,6 +60,15 @@ class ProductController extends Controller
                     $product->image = $filename;
                 }
             }
+
+            if(empty($request->status)){
+                $status = 0;
+                // if there is no status, 0
+            } else {
+                // if there is a status, 1
+                $status = 1;
+            }
+            $product->status = $status;
             
             $product->save();
             //return redirect()->back()->with('flash_message_success', 'Product has been added Successfully!');
@@ -110,6 +120,14 @@ class ProductController extends Controller
                 $request->care = '';
             }
 
+            if(empty($request->status)){
+                $status = 0;
+                // if there is no status, 0
+            } else {
+                // if there is a status, 1
+                $status = 1;
+            }
+
             Product::where('id', $id)->update([
                 'category_id' => $request->category_id,
                 'product_name' => $request->product_name,
@@ -118,7 +136,8 @@ class ProductController extends Controller
                 'description' => $request->description,
                 'care' => $request->care,
                 'price' => $request->price,
-                'image' => $filename
+                'image' => $filename,
+                'status' => $status
             ]);
             return redirect()->back()->with('flash_message_success', 'Product has been updated successfully!');
         }
@@ -247,6 +266,19 @@ class ProductController extends Controller
         return view('admin.products.add_attributes')->with(compact('product'));
     }
 
+    public function editAttributes(Request $request, $id = null)
+    {
+        if($request->isMethod('post')){
+            //echo '<pre>'; print_r($request->all()); die;
+            foreach($request->idAttr as $key => $attr){
+                ProductsAttribute::where(['id' => $request->idAttr[$key]])
+                    ->update(['price' => $request->price[$key], 
+                              'stock' => $request->stock[$key]]);
+            }
+            return redirect()->back()->with('flash_message_success', 'Products Attributes has been updated successfully!');
+        }
+    }
+
     public function addImages(Request $request, $id = null)
     {
         $product = Product::with('attributes')->where('id', $id)->first();
@@ -300,19 +332,25 @@ class ProductController extends Controller
             foreach($subCategories as $subcategory){
                 $cat_ids[] = $subcategory->id;
             }
-            $products = Product::whereIn('category_id', $cat_ids)->get();
+            $products = Product::whereIn('category_id', $cat_ids)->where('status', 1)->get();
         } else {
-            $products = Product::where(['category_id' => $categoryDetails->id])->get();
+            $products = Product::where(['category_id' => $categoryDetails->id])->where('status', 1)->get();
         }
         return view('products.listing', compact('categories', 'categoryDetails', 'products'));
     }
 
     public function product($id = null)
     {
+        $productStatus = Product::where(['id' => $id, 'status' => 1])->count();
+        if($productStatus == 0){
+            abort(404);
+        }
         $product = Product::with('attributes')->where('id', $id)->first();
         $productAltImages = ProductsImage::where(['product_id' => $id])->get();
         $categories = Category::with('categories')->where(['parent_id' => 0])->get();
-        return view('products.detail', compact('product', 'categories', 'productAltImages'));
+        $relatedProducts = Product::where('id', '!=', $id)->where(['category_id' => $product->category_id])->where('status', 1)->get();
+        $total_stock = ProductsAttribute::where('product_id', $id)->sum('stock');
+        return view('products.detail', compact('product', 'categories', 'productAltImages', 'total_stock', 'relatedProducts'));
     }
 
     public function getProductPrice(Request $request)
@@ -324,5 +362,33 @@ class ProductController extends Controller
         $productsAttribute = ProductsAttribute::where(['product_id' => $proArr[0], 'size' => $proArr[1]])->first();
         //we get the id and size from the value, use the value to send an ajax, split those values, and pull what we need
         echo $productsAttribute->price;
+        echo "#";
+        echo $productsAttribute->stock;
+    }
+
+    public function addtocart(Request $request)
+    {
+
+        if(empty($request->user_email)){
+            $request->user_email = '';
+        }
+
+        if(empty($request->session_id)){
+            $request->session_id = '';
+        }
+
+        $sizeArr = explode("-", $request['size']);
+
+        DB::table('cart')->insert([
+            'product_id' => $request->product_id,
+            'product_name' => $request->product_name,
+            'product_code' => $request->product_code,
+            'product_color' => $request->product_color,
+            'price' => $request->price,
+            'size' => $sizeArr[1],
+            'quantity' => $request->quantity,
+            'user_email' => $request->user_email,
+            'session_id' => $request->session_id
+        ]);
     }
 }

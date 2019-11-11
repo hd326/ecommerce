@@ -97,15 +97,24 @@
             </div>
         </div>
         <div class="control-group">
-                <label class="control-label">Image:</label>
-                <div class="controls">
-                    <input type="file" name="image" id="image">
-                    <input type="hidden" name="current_image" value="{{ $product->image }}"> 
-                    @if(!empty($product->image))
-                    <img style="width: 40px;" src="{{ asset('images/backend_images/products/small/'.$product->image) }}"> | <a href="{{ url('/admin/delete-product-image/'.$product->id) }}">Delete</a>
-                    @endif
-                </div>
+            <label class="control-label">Image:</label>
+            <div class="controls">
+                <input type="file" name="image" id="image">
+                <input type="hidden" name="current_image" value="{{ $product->image }}">
+                @if(!empty($product->image))
+                <img style="width: 40px;" src="{{ asset('images/backend_images/products/small/'.$product->image) }}"> |
+                <a href="{{ url('/admin/delete-product-image/'.$product->id) }}">Delete</a>
+                @endif
             </div>
+        </div>
+
+        <div class="control-group">
+            <label class="control-label">Enable:</label>
+            <div class="controls">
+                <input type="checkbox" name="status" id="status" @if($product->status == 1) checked @endif
+                    value="1">
+            </div>
+        </div>
         <div class="form-actions">
             <input type="submit" value="Edit Product" class="btn btn-success">
         </div>

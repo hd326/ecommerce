@@ -54,7 +54,7 @@
                             <div class="control-group">
                                     <label class="control-label">Enable:</label>
                                     <div class="controls">
-                                        <input type="checkbox" name="url" id="url" value="@if($category->status == 1) checked @endif" value="1">
+                                        <input type="checkbox" name="status" id="status" @if($category->status == 1) checked @endif value="1">
                                     </div>
                                 </div>
 

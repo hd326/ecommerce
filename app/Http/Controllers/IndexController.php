@@ -15,7 +15,7 @@ class IndexController extends Controller
         // In Descending order
         $products = Product::orderBy('id', 'DESC')->get();
         // In Random Order
-        $products = Product::inRandomOrder()->get();
+        $products = Product::inRandomOrder()->where('status', 1)->get();
 
         $categories = Category::with('categories')->where(['parent_id' => 0])->get();
         return view('index', compact('products', 'categories'));
