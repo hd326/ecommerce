@@ -33,17 +33,20 @@ Route::get('/products/{url}', 'ProductController@products');
 // Product Detail Page
 Route::get('/product/{id}', 'ProductController@product');
 
-// Get product attribute price from DB AJAX
+// Get Product Attribute price
 Route::get('/get-product-price', 'ProductController@getProductPrice');
-
-// Add To Cart Route
-Route::match(['get', 'post'], '/add-cart', 'ProductController@addtocart');
 
 // Cart Page
 Route::match(['get', 'post'], '/cart', 'ProductController@cart');
 
+// Add To Cart Route
+Route::match(['get', 'post'], '/add-cart', 'ProductController@addtocart');
+
 // Delete Product from Cart Page
 Route::get('/cart/delete-product/{id}', 'ProductController@deleteCartProduct');
+
+// Apply Coupon
+Route::post('/cart/apply-coupon', 'ProductController@applyCoupon');
 
 // Update Product Quantity in Cart
 Route::get('/cart/update-quantity/{id}/{quantity}', 'ProductController@updateCartQuantity');
@@ -57,8 +60,9 @@ Route::group(['middleware' => ['auth']], function() {
     // Category Routes (Admin)
     Route::match(['get', 'post'], '/admin/add-category', 'CategoryController@addCategory')->middleware('auth');
     Route::match(['get', 'post'], '/admin/edit-category/{id}', 'CategoryController@editCategory')->middleware('auth');
-    Route::match(['get', 'post'], '/admin/delete-category/{id}', 'CategoryController@deleteCategory')->middleware('auth');
     Route::get('/admin/view-categories', 'CategoryController@viewCategories')->middleware('auth');
+    Route::match(['get', 'post'], '/admin/delete-category/{id}', 'CategoryController@deleteCategory')->middleware('auth');
+    
 
     // Product Routes
     Route::match(['get', 'post'], '/admin/add-product', 'ProductController@addProduct')->middleware('auth');
@@ -73,6 +77,12 @@ Route::group(['middleware' => ['auth']], function() {
     Route::match(['get', 'post'], 'admin/edit-attributes/{id}', 'ProductController@editAttributes')->middleware('auth');
     Route::match(['get', 'post'], 'admin/add-images/{id}', 'ProductController@addImages')->middleware('auth');
     Route::get('/admin/delete-attribute/{id}', 'ProductController@deleteAttribute')->middleware('auth');
+
+    // Coupon Routes
+    Route::match(['get', 'post'], '/admin/add-coupon', 'CouponController@addCoupon');
+    Route::match(['get', 'post'], '/admin/edit-coupon/{id}', 'CouponController@editCoupon');
+    Route::get('/admin/delete-coupon/{id}', 'CouponController@deleteCoupon');
+    Route::get('/admin/view-coupons', 'CouponController@viewCoupons');
 });
 
 Route::get('/logout', 'AdminController@logout');

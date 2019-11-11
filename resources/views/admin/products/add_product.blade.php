@@ -28,7 +28,7 @@
                         <h5>Add Product</h5>
                     </div>
                     <div class="widget-content nopadding">
-                        <form enctype="multipart/form-data" class="form-horizontal" method="post" action="#" name="add_product" id="add_product"
+                        <form enctype="multipart/form-data" class="form-horizontal" method="post" action="{{ url('/admin/add-product') }}" name="add_product" id="add_product"
                             novalidate="novalidate">
                             {{ csrf_field() }}
                             <div class="control-group">
@@ -88,7 +88,7 @@
                                 </div>
                             </div>
                             <div class="form-actions">
-                                <input type="submit" value="Validate" class="btn btn-success">
+                                <input type="submit" value="Add Product" class="btn btn-success">
                             </div>
                         </form>
                     </div>

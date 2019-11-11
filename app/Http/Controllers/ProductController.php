@@ -7,6 +7,7 @@ use App\Category;
 use App\Product;
 use App\ProductsAttribute;
 use App\ProductsImage;
+use App\Coupon;
 use Auth;
 use Session;
 use Illuminate\Support\Facades\Input;
@@ -437,14 +438,69 @@ class ProductController extends Controller
     public function updateCartQuantity($id = null, $quantity = null)
     {
         $getCartDetails = DB::table('cart')->where('id', $id)->first();
+        // Get our Cart details to compare
         $getAttributeStock = ProductsAttribute::where('sku', $getCartDetails->product_code)->first();
+        // Get our Stock details to compare against Cart
         $updated_quantity = $getCartDetails->quantity+$quantity;
+        // Comparison value of +1 into cart
         if($getAttributeStock->stock >= $updated_quantity){
+        // If Database stock >= Cart stock, increment
         DB::table('cart')->where('id', $id)->increment('quantity', $quantity);
         return redirect('cart')->with('flash_message_success', 'Product Quantity has been updated from Successfully!');
         } else {
             return redirect('cart')->with('flash_message_error', 'Required Product Quantity is not available!');
         }
-        
+    }
+
+    public function applyCoupon(Request $request)
+    {
+        Session::forget('CouponAmount');
+        Session::forget('CouponCode');
+
+        $couponCount = Coupon::where('coupon_code', $request->coupon_code)->count();
+        if($couponCount == 0){
+            return redirect()->back()->with('flash_message_error', 'Coupon is not valid');
+        } else {
+
+            $couponDetails = Coupon::where('coupon_code', $request->coupon_code)->first();
+
+            // If coupon is Inactive
+            if($couponDetails->status == 0) {
+                return redirect()->back()->with('flash_message_error', 'This coupon is not active!');
+            }
+
+            // If coupon is Expired
+            $expiry_date = $couponDetails->expiry_date;
+            $current_date = date('Y-m-d');
+            if($expiry_date < $current_date){
+                return redirect()->back()->with('flash_message_error', 'This coupon is expired!');
+            }
+
+            // Coupon is Valid for Discount
+
+            // Get Cart Total Amount
+
+            $session_id = Session::get('session_id');
+
+            $userCart = DB::table('cart')->where('session_id', $session_id)->get();
+
+            $total_amount = 0;
+            foreach($userCart as $item){
+                $total_amount = $total_amount + ($item->price * $item->quantity);
+            }
+
+            // If amount type is Fixed or Percentage
+            if($couponDetails->amount_type == "Fixed"){
+                $couponAmount = $couponDetails->amount;
+            } else {
+                $couponAmount = $total_amount * ($couponDetails->amount/100);
+            }
+
+            // Add Coupon Code & Amount
+            Session::put('CouponAmount', $couponAmount);
+            Session::put('CouponCode', $request->coupon_code);
+
+            return redirect()->back()->with('flash_message_success', 'Coupon code successfully applied.');
+        }
     }
 }

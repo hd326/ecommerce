@@ -16,6 +16,7 @@
 <link href="{{ asset('fonts/backend_fonts/css/font-awesome.css') }}" rel="stylesheet" />
 <link rel="stylesheet" href="{{ asset('css/backend_css/jquery.gritter.css') }}"  />
 <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700,800' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 </head>
 <body>
 
@@ -76,7 +77,7 @@ function resetMenu() {
 </script>
 
 <script src="{{ asset('js/backend_js/jquery.min.js') }}"></script> 
-<script src="{{ asset('js/backend_js/jquery.ui.custom.js') }}"></script> 
+{{-- <script src="{{ asset('js/backend_js/jquery.ui.custom.js') }}"></script>  --}}
 <script src="{{ asset('js/backend_js/bootstrap.min.js') }}"></script> 
 <script src="{{ asset('js/backend_js/jquery.uniform.js') }}"></script> 
 <script src="{{ asset('js/backend_js/select2.min.js') }}"></script> 
@@ -89,8 +90,15 @@ function resetMenu() {
 <script src="{{ asset('js/backend_js/matrix.form_validation.js') }}"></script>
 <!-- imported for view product modal -->
 <script src="{{ asset('js/backend_js/matrix.popover.js') }}"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@8"></script>
-
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+  $(function() {
+    $("#expiry_date").datepicker({ 
+      minDate: 0,
+      dateFormat: 'yy-mm-dd' 
+      });
+  });
+</script>
 
 </body>
 </html>

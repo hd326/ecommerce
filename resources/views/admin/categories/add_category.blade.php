@@ -14,7 +14,7 @@
               <h5>Add Category</h5>
             </div>
             <div class="widget-content nopadding">
-              <form class="form-horizontal" method="post" action="#" name="add_category" id="add_category" novalidate="novalidate">
+              <form class="form-horizontal" method="post" action="{{ url('/admin/add-category') }}" name="add_category" id="add_category" novalidate="novalidate">
                 {{ csrf_field() }}
                 <div class="control-group">
                   <label class="control-label">Category Name:</label>
@@ -53,7 +53,7 @@
                 </div>
 
                 <div class="form-actions">
-                  <input type="submit" value="Validate" class="btn btn-success">
+                  <input type="submit" value="Add Category" class="btn btn-success">
                 </div>
               </form>
             </div>
