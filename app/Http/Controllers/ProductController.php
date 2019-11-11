@@ -373,22 +373,78 @@ class ProductController extends Controller
             $request->user_email = '';
         }
 
-        if(empty($request->session_id)){
-            $request->session_id = '';
+        //if(empty($request->session_id)){
+        //    $request->session_id = '';
+        //}
+        $session_id = Session::get('session_id');
+        if(empty($session_id)) {
+            $session_id = str_random(40);
+            Session::put('session_id', $session_id);
         }
 
         $sizeArr = explode("-", $request['size']);
 
-        DB::table('cart')->insert([
+        $countProducts = DB::table('cart')->where([
             'product_id' => $request->product_id,
-            'product_name' => $request->product_name,
-            'product_code' => $request->product_code,
             'product_color' => $request->product_color,
-            'price' => $request->price,
             'size' => $sizeArr[1],
-            'quantity' => $request->quantity,
-            'user_email' => $request->user_email,
-            'session_id' => $request->session_id
-        ]);
+            'session_id' => $session_id
+        ])->count();
+
+        if($countProducts > 0)
+        {
+            return redirect()->back()->with('flash_message_error', 'Product already exists in Cart!');
+        } else {
+
+            $getSKU = ProductsAttribute::select('sku')->where([
+                'product_id' => $request->product_id,
+                'size' => $sizeArr[1]
+                ])->first();
+
+            DB::table('cart')->insert([
+                'product_id' => $request->product_id,
+                'product_name' => $request->product_name,
+                'product_code' => $getSKU->sku,
+                'product_color' => $request->product_color,
+                'price' => $request->price,
+                'size' => $sizeArr[1],
+                'quantity' => $request->quantity,
+                'user_email' => $request->user_email,
+                'session_id' => $session_id
+            ]);
+        }
+
+        return redirect('cart')->with('flash_message_success', 'Product has been added in Cart!');
+    }
+
+    public function cart()
+    {
+        $session_id = Session::get('session_id');
+        $userCart = DB::table('cart')->where('session_id', $session_id)->get();
+        foreach($userCart as $key => $product){
+            $product = Product::where('id', $product->product_id)->first();
+            $userCart[$key]->image = $product->image;
+        }
+        return view('products.cart', compact('userCart'));
+    }
+
+    public function deleteCartProduct($id = null)
+    {
+        DB::table('cart')->where('id', $id)->delete();
+        return redirect('cart')->with('flash_message_success', 'Product has been deleted from Cart!');
+    }
+
+    public function updateCartQuantity($id = null, $quantity = null)
+    {
+        $getCartDetails = DB::table('cart')->where('id', $id)->first();
+        $getAttributeStock = ProductsAttribute::where('sku', $getCartDetails->product_code)->first();
+        $updated_quantity = $getCartDetails->quantity+$quantity;
+        if($getAttributeStock->stock >= $updated_quantity){
+        DB::table('cart')->where('id', $id)->increment('quantity', $quantity);
+        return redirect('cart')->with('flash_message_success', 'Product Quantity has been updated from Successfully!');
+        } else {
+            return redirect('cart')->with('flash_message_error', 'Required Product Quantity is not available!');
+        }
+        
     }
 }

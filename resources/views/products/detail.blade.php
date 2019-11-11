@@ -4,6 +4,18 @@
 <section>
     <div class="container">
         <div class="row">
+            @if(Session::has('flash_message_error'))
+            <div class="alert alert-error alert-block" style="background-color:#d9534f">
+                <button type="button" class="close" data-dismiss="alert">x</button>
+                <strong>{!! session('flash_message_error') !!} </strong>
+            </div>
+            @endif
+            @if(Session::has('flash_message_success'))
+            <div class="alert alert-success alert-block">
+                <button type="button" class="close" data-dismiss="alert">x</button>
+                <strong>{!! session('flash_message_success') !!} </strong>
+            </div>
+            @endif
             <div class="col-sm-3">
                 @include('layouts.frontLayout.front_sidebar')
             </div>
@@ -53,36 +65,37 @@
                             <input type="hidden" name="product_color" value="{{ $product->product_color }}">
                             <input type="hidden" name="price" id="price" value="{{ $product->price }}">
                             <div class="product-information">
-                            <!--/product-information-->
-                            <img src="images/product-details/new.jpg" class="newarrival" alt="" />
-                            <h2>{{ $product->product_name }}</h2>
-                            <p>Code: {{ $product->product_code}}</p>
-                            <p>
-                                <select id="selSize" name="size" style="width: 150px;">
-                                    <option value="">Select size</option>
-                                    @foreach($product->attributes as $attribute)
-                                    <option value="{{ $product->id }}-{{ $attribute->size }}">{{ $attribute->size }}
-                                    </option>
-                                    @endforeach
-                                </select>
-                            </p>
-                            <img src="images/product-details/rating.png" alt="" />
-                            <span>
-                                <span id="getPrice">US {{ $product->price }}</span>
-                                <label>Quantity:</label>
-                                <input name="quantity" type="text" value="1" />
-                                @if($total_stock>0)
-                                <button type="submit" id="getCart" type="button" class="btn btn-fefault cart">
-                                    <i class="fa fa-shopping-cart"></i>
-                                    Add to cart
-                                </button>
-                                @endif
-                            </span>
-                            <p><b>Availability: </b><span id="getAvailability">@if($total_stock>0) In Stock @else Out of
-                                    Stock @endif</span></p>
-                            <p><b>Condition:</b> New</p>
-                            <a href=""><img src="images/product-details/share.png" class="share img-responsive"
-                                    alt="" /></a>
+                                <!--/product-information-->
+                                <img src="images/product-details/new.jpg" class="newarrival" alt="" />
+                                <h2>{{ $product->product_name }}</h2>
+                                <p>Code: {{ $product->product_code}}</p>
+                                <p>
+                                    <select id="selSize" name="size" style="width: 150px;">
+                                        <option value="">Select size</option>
+                                        @foreach($product->attributes as $attribute)
+                                        <option value="{{ $product->id }}-{{ $attribute->size }}">{{ $attribute->size }}
+                                        </option>
+                                        @endforeach
+                                    </select>
+                                </p>
+                                <img src="images/product-details/rating.png" alt="" />
+                                <span>
+                                    <span id="getPrice">US {{ $product->price }}</span>
+                                    <label>Quantity:</label>
+                                    <input name="quantity" type="text" value="1" />
+                                    @if($total_stock>0)
+                                    <button type="submit" id="getCart" type="button" class="btn btn-fefault cart">
+                                        <i class="fa fa-shopping-cart"></i>
+                                        Add to cart
+                                    </button>
+                                    @endif
+                                </span>
+                                <p><b>Availability: </b><span id="getAvailability">@if($total_stock>0) In Stock @else
+                                        Out of
+                                        Stock @endif</span></p>
+                                <p><b>Condition:</b> New</p>
+                                <a href=""><img src="images/product-details/share.png" class="share img-responsive"
+                                        alt="" /></a>
                             </div>
                         </form>
                         <!--/product-information-->
@@ -137,11 +150,13 @@
                                     <div class="product-image-wrapper">
                                         <div class="single-products">
                                             <div class="productinfo text-center">
-                                                <img src="{{ asset('/images/backend_images/products/small/'.$item->image) }}" alt="" />
+                                                <img src="{{ asset('/images/backend_images/products/small/'.$item->image) }}"
+                                                    alt="" />
                                                 <h2>{{ $item->price }}</h2>
                                                 <p>{{ $item->product_name }}</p>
-                                                <a href="{{ url('product/'.$item->id) }}"><button type="button" class="btn btn-default add-to-cart"><i
-                                                        class="fa fa-shopping-cart"></i>Add to cart</button></a>
+                                                <a href="{{ url('product/'.$item->id) }}"><button type="button"
+                                                        class="btn btn-default add-to-cart"><i
+                                                            class="fa fa-shopping-cart"></i>Add to cart</button></a>
                                             </div>
                                         </div>
                                     </div>
