@@ -19,12 +19,13 @@ class ProductController extends Controller
     public function addProduct(Request $request)
     {
         if($request->isMethod('post')){
-            $product = new Product;
-            $data = $request->all();
-            //echo "<pre>";print_r($request->all());die;
             if(empty($request->category_id)){
                 return redirect()->back()->with('flash_message_error', 'Under Category is missing!');
             }
+            
+            $product = new Product;
+            //echo "<pre>";print_r($request->all());die;
+
             $product->category_id = $request->category_id;
             $product->product_name = $request->product_name;
             $product->product_code = $request->product_code;
@@ -109,8 +110,10 @@ class ProductController extends Controller
                     Image::make($image_tmp)->resize(300,300)->save($small_image_path);
                     // Store image name in products table
                 }
-            } else {
+            } elseif (!empty($request->current_image)) {
                 $filename = $request->current_image; 
+            } else {
+                $filename = "";
             }
 
             if(empty($request->description)) {

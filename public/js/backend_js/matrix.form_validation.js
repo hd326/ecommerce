@@ -232,6 +232,13 @@ $(document).ready(function(){
 		return false;
 	});
 
+	$('#delBanner').click(function(){
+		if(confirm('Are you sure you want to delete this Banner?')){
+			return true;
+		}
+		return false;
+	});
+
 	//$(".deleteRecord").click(function(){
 	//	var id = $(this).attr('rel');
 	//	var deleteRoute = $(this).attr('rel1');
