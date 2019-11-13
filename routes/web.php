@@ -51,6 +51,19 @@ Route::post('/cart/apply-coupon', 'ProductController@applyCoupon');
 // Update Product Quantity in Cart
 Route::get('/cart/update-quantity/{id}/{quantity}', 'ProductController@updateCartQuantity');
 
+// User Register/Login Page
+Route::get('/login-register', 'UserController@userLoginRegister');
+
+// User Register Form Submit
+Route::post('/user-register', 'UserController@register');
+
+// User Logout
+Route::get('/user-logout', 'UserController@logout');
+
+// Check is User already exists
+Route::match(['GET', 'POST'], '/check-email', 'UserController@checkEmail');
+
+
 Route::group(['middleware' => ['auth']], function() {
     Route::get('/admin/dashboard', 'AdminController@dashboard')->middleware('auth');
     Route::get('/admin/settings', 'AdminController@settings')->middleware('auth');
