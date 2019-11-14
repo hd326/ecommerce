@@ -126,6 +126,38 @@ $().ready(function(){
         }
     });
 
+    $("#loginForm").validate({
+        rules: {
+            email: {
+                required: true,
+                email: true,
+            },
+            password: {
+                required: true,
+                minlength: 6
+            },
+            
+        },
+
+        messages: {
+            name: {
+                required: "Please enter your name.",
+                minlength: "Your name must be at least 2 characters long.",
+                accept: "Your name must contain only letters."
+            },
+            
+            password: {
+                required: "Please provide your password.",
+                minlength: "Your password must be at least 6 characters."
+            },
+            email: {
+                required: "Please enter your email.",
+                email: "Please enter valid email.",
+                remote: "Email already exists."
+            }
+        }
+    });
+
     $('#myPassword').passtrength({
         tooltip:true,
         textWeak:"Weak",

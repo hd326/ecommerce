@@ -19,17 +19,8 @@
                 @endif
             <div class="col-sm-4 col-sm-offset-1">
                 <div class="login-form"><!--login form-->
-                    <h2>Login to your account</h2>
-                    <form id="loginForm" name="loginForm" action="{{ url('/user-login') }}" method="POST">
-                        {{ csrf_field() }}
-                        <input name="email" type="email" placeholder="Email Address" />
-                        <input name="password" type="password" placeholder="Password" />
-                        {{-- <span>
-                            <input type="checkbox" class="checkbox"> 
-                            Keep me signed in
-                        </span> --}}
-                        <button type="submit" class="btn btn-default">Login</button>
-                    </form>
+                    <h2>Update Account</h2>
+                    
                 </div><!--/login form-->
             </div>
             <div class="col-sm-1">
@@ -37,14 +28,8 @@
             </div>
             <div class="col-sm-4">
                 <div class="signup-form"><!--sign up form-->
-                    <h2>New User Signup!</h2>
-                    <form id="registerForm" name="registerForm" action="{{ url('/user-register') }}" method="POST" >
-                        {{ csrf_field() }}
-                        <input id="name" name="name" type="text" placeholder="Name"/>
-                        <input id="email" name="email" type="email" placeholder="Email Address"/>
-                        <input id="myPassword" name="password" type="password" placeholder="Password"/>
-                        <button type="submit" class="btn btn-default">Signup</button>
-                    </form>
+                    <h2>Update Password</h2>
+                    
                 </div><!--/sign up form-->
             </div>
         </div>
