@@ -126,6 +126,53 @@ $().ready(function(){
         }
     });
 
+    $("#accountForm").validate({
+        rules: {
+            name: {
+                required: true,
+                minlength: 2,
+                accept: "[a-zA-Z]+"
+            },
+            address: {
+                required: true,
+                minlength: 6
+            },
+            city: {
+                required: true,
+            },
+            state: {
+                required: true,
+                minlength: 2
+            },
+            country: {
+                required: true,
+            }
+        },
+
+        messages: {
+            name: {
+                required: "Please enter your name.",
+                minlength: "Your name must be at least 2 characters long.",
+                accept: "Your name must contain only letters."
+            },
+            address: {
+                required: "Please provide your address.",
+                minlength: "Your address must be at least 6 characters."
+            },
+            city: {
+                required: "Please enter your city.",
+            },
+            state: {
+                required: "Please provide your state.",
+                minlength: "Your state must be at least 2 characters."
+            },
+            country: {
+                required: "Please provide your country.",
+                minlength: "Your country must be at least 2 characters."
+            },
+        }
+    });
+
     $("#loginForm").validate({
         rules: {
             email: {
@@ -158,6 +205,49 @@ $().ready(function(){
         }
     });
 
+    $("#passwordForm").validate({
+        rules: {
+            current_pwd: {
+                required: true,
+                minlength: 6,
+                maxlength: 20
+            },
+            new_pwd: {
+                required: true,
+                minlength: 6,
+                maxlength: 20
+            },
+            confirm_pwd:{
+                required: true,
+                minlength: 6,
+                maxlength: 20,
+                equalTo: "#new_pwd"
+            }
+        }
+    });
+
+    $("#current_pwd").keyup(function(){
+        var current_pwd = $(this).val();
+        $.ajax({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            type:'post',
+            url:'/check-user-pwd',
+            data:{current_pwd: current_pwd},
+            success: function(response){
+                if(response=="false"){
+                    $("#chkPwd").html("<font color='red'>Current Password is incorrect</font>");
+                } else if(response=="true"){
+                    $("#chkPwd").html("<font color='green'>Current Password is correct</font>");
+                }
+            },
+            error: function(){
+                //alert("Error");
+            }
+        });
+    });
+
     $('#myPassword').passtrength({
         tooltip:true,
         textWeak:"Weak",
@@ -165,6 +255,28 @@ $().ready(function(){
         textStrong:"Strong",
         textVeryStrong:"Very Strong",
         eyeImg: "images/frontend_images/eye.svg"
+    });
+
+    // Copy Billing Address to Shipping Address
+
+    $("#billToShip").on('click', function(){
+        if(this.checked) {
+            $("#shipping_name").val($("#billing_name").val());
+            $("#shipping_address").val($("#billing_address").val());
+            $("#shipping_city").val($("#billing_city").val());
+            $("#shipping_state").val($("#billing_state").val());
+            $("#shipping_zipcode").val($("#billing_zipcode").val());
+            $("#shipping_mobile").val($("#billing_mobile").val());
+            $("#shipping_country").val($("#billing_country").val());
+        } else {
+            $("#shipping_name").val('');
+            $("#shipping_address").val('');
+            $("#shipping_city").val('');
+            $("#shipping_state").val('');
+            $("#shipping_zipcode").val('');
+            $("#shipping_mobile").val('');
+            $("#shipping_country").val('');
+        }
     });
 });
 

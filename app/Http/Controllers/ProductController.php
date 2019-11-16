@@ -8,6 +8,9 @@ use App\Product;
 use App\ProductsAttribute;
 use App\ProductsImage;
 use App\Coupon;
+use App\User;
+use App\Country;
+use App\DeliveryAddress;
 use Auth;
 use Session;
 use Illuminate\Support\Facades\Input;
@@ -514,5 +517,73 @@ class ProductController extends Controller
 
             return redirect()->back()->with('flash_message_success', 'Coupon code successfully applied.');
         }
+    }
+
+    public function checkout(Request $request)
+    {
+        $userDetails = User::where('id', Auth::user()->id)->first();
+        $countries = Country::get();
+
+        $shippingCount = DeliveryAddress::where('user_id', auth()->id())->count();
+        if($shippingCount > 0) {
+            $shippingDetails = DeliveryAddress::where('user_id', auth()->id())->first();
+        }
+
+        if($request->isMethod('post')){
+            if(empty($request->billing_name) || 
+            empty($request->billing_address) || 
+            empty($request->billing_city) ||
+            empty($request->billing_state) ||
+            empty($request->billing_country) ||
+            empty($request->billing_zipcode) ||
+            empty($request->billing_mobile) ||
+            empty($request->shipping_name) || 
+            empty($request->shipping_address) || 
+            empty($request->shipping_city) ||
+            empty($request->shipping_state) ||
+            empty($request->shipping_country) ||
+            empty($request->shipping_zipcode) ||
+            empty($request->shipping_mobile)){
+                return redirect()->back()->with('flash_message_error', 'Please fill out all fields to Checkout!');
+            }
+            // Update user details for specified billing information
+            User::where('id', auth()->id())->update([
+                'name' => $request->billing_name,
+                'address' => $request->billing_address,
+                'city' => $request->billing_city,
+                'state' => $request->billing_state,
+                'country' => $request->billing_country,
+                'zipcode' => $request->billing_zipcode,
+                'mobile' => $request->billing_mobile
+                ]);
+
+            if($shippingCount > 0){
+                // Update Shipping Address
+                DeliveryAddress::where('user_id', auth()->id())->update([
+                'name' => $request->shipping_name,
+                'address' => $request->shipping_address,
+                'city' => $request->shipping_city,
+                'state' => $request->shipping_state,
+                'country' => $request->shipping_country,
+                'zipcode' => $request->shipping_zipcode,
+                'mobile' => $request->shipping_mobile
+                ]);
+            } else {
+                // Add new Shipping Address
+                $shipping = new DeliveryAddress;
+                $shipping->user_id = auth()->id();
+                $shipping->user_email = auth()->user()->email;
+                $shipping->name = $request->shipping_name;
+                $shipping->address = $request->shipping_address;
+                $shipping->city = $request->shipping_city;
+                $shipping->state = $request->shipping_state;
+                $shipping->zipcode = $request->shipping_zipcode;
+                $shipping->country = $request->shipping_country;
+                $shipping->mobile = $request->shipping_mobile;
+                $shipping->save();
+            } 
+            echo "Redirect to Order Review Page"; die;
+        }
+        return view('products.checkout', compact('userDetails', 'countries', 'shippingDetails'));
     }
 }
