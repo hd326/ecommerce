@@ -331,7 +331,10 @@ class ProductController extends Controller
             abort(404);
         }
 
+        // For sidebar
         $categories = Category::with('categories')->where(['parent_id' => 0])->get();
+
+        // Get where URL
         $categoryDetails = Category::where(['url' => $url])->first();
 
         if($categoryDetails->parent_id == 0) {
@@ -390,9 +393,11 @@ class ProductController extends Controller
             $session_id = str_random(40);
             Session::put('session_id', $session_id);
         }
+        // Explode the product ID and product Size
 
         $sizeArr = explode("-", $request['size']);
 
+        // Check to see if product exists in cart
         $countProducts = DB::table('cart')->where([
             'product_id' => $request->product_id,
             'product_color' => $request->product_color,
@@ -404,7 +409,7 @@ class ProductController extends Controller
         {
             return redirect()->back()->with('flash_message_error', 'Product already exists in Cart!');
         } else {
-
+            // Add to Cart
             $getSKU = ProductsAttribute::select('sku')->where([
                 'product_id' => $request->product_id,
                 'size' => $sizeArr[1]
@@ -428,9 +433,10 @@ class ProductController extends Controller
 
     public function cart()
     {
-
+        // Grab all items from session
         $session_id = Session::get('session_id');
         $userCart = DB::table('cart')->where('session_id', $session_id)->get();
+        // Get images for cart items
         foreach($userCart as $key => $product){
             $product = Product::where('id', $product->product_id)->first();
             $userCart[$key]->image = $product->image;
@@ -471,7 +477,7 @@ class ProductController extends Controller
     {
         Session::forget('CouponAmount');
         Session::forget('CouponCode');
-
+        // Check if coupon is valid
         $couponCount = Coupon::where('coupon_code', $request->coupon_code)->count();
         if($couponCount == 0){
             return redirect()->back()->with('flash_message_error', 'Coupon is not valid');
@@ -521,13 +527,19 @@ class ProductController extends Controller
 
     public function checkout(Request $request)
     {
-        $userDetails = User::where('id', Auth::user()->id)->first();
+        $userDetails = User::where('id', auth()->id())->first();
         $countries = Country::get();
 
         $shippingCount = DeliveryAddress::where('user_id', auth()->id())->count();
         if($shippingCount > 0) {
             $shippingDetails = DeliveryAddress::where('user_id', auth()->id())->first();
+        } else {
+            $shippingDetails = "";
         }
+
+        // Update cart with user email
+        $session_id = Session::get('session_id');
+        DB::table('cart')->where(['session_id' => $session_id])->update(['user_email'=>auth()->user()->email]);
 
         if($request->isMethod('post')){
             if(empty($request->billing_name) || 
@@ -582,8 +594,27 @@ class ProductController extends Controller
                 $shipping->mobile = $request->shipping_mobile;
                 $shipping->save();
             } 
-            echo "Redirect to Order Review Page"; die;
+            return redirect('/order-review');
         }
         return view('products.checkout', compact('userDetails', 'countries', 'shippingDetails'));
+    }
+
+    public function orderReview()
+    {
+        $userDetails = User::where('id', auth()->id())->first();
+        $shippingDetails = DeliveryAddress::where('user_id', auth()->id())->first();
+        $cartDetails = DB::table('cart')->where('session_id', Session::get('session_id'))->get();
+        foreach($cartDetails as $key => $product) {
+            $product = Product::where('id', $product->product_id)->first();
+            $cartDetails[$key]->image = $product->image;
+        }
+        return view('products.order_review', compact('userDetails', 'shippingDetails', 'cartDetails'));
+    }
+
+    public function placeOrder(Request $request)
+    {
+        if($request->isMethod('post')){
+            
+        }
     }
 }

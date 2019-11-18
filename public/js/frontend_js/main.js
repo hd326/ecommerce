@@ -280,6 +280,11 @@ $().ready(function(){
     });
 });
 
-$(document).ready(function(){
-    
-});
+function selectPaymentMethod(){
+    if($("#Paypal").is(':checked') || $("#COD").is(':checked')){
+
+    } else {
+        alert("Please select Payment Method");
+    }
+    return false;
+}
