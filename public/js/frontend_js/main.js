@@ -285,6 +285,6 @@ function selectPaymentMethod(){
 
     } else {
         alert("Please select Payment Method");
+        return false;
     }
-    return false;
 }

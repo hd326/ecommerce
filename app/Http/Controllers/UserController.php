@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\Country;
+use DB;
 use Auth;
 use Session;
 use Illuminate\Support\Facades\Hash;
@@ -30,6 +31,10 @@ class UserController extends Controller
             if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
                 Session::put('frontSession', $request->email);
                 // unique email
+                if(!empty(Session::get('session_id'))){
+                    $session_id = Session::get('session_id');
+                    DB::table('cart')->where('session_id',$session_id)->update(['user_email' => $request->email]);
+                }
                 return redirect('/cart');
             }
         }
@@ -47,6 +52,10 @@ class UserController extends Controller
         if($request->isMethod('post')){
             if(Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
                 Session::put('frontSession', $request->email);
+                if(!empty(Session::get('session_id'))){
+                    $session_id = Session::get('session_id');
+                    DB::table('cart')->where('session_id',$session_id)->update(['user_email' => $request->email]);
+                }
                 return redirect('/cart');
             } else {
                 return redirect()->back()->with('flash_message_error', 'Invalid Username or Password');
