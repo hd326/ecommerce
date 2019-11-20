@@ -652,7 +652,7 @@ class ProductController extends Controller
             if(empty($request->shipping_charges)){
                 $request->shipping_charges = '0.00';
             }
-            // Order consist of customer shipping details
+            // Order consist of customer shipping details from the Delivery Address as instantiated in checkout
             $shippingDetails = DeliveryAddress::where(['user_email' => $user_email])->first();
             $order = new Order;
             $order->user_id = $user_id;
@@ -675,7 +675,7 @@ class ProductController extends Controller
             // Get the last insert ID for our order
             $order_id = DB::getPdo()->lastInsertId();
 
-
+            // When customer places order, there has to be an email in the Cart, we update the cart with session => email when the customer logs in
             $cartProducts = DB::table('cart')->where(['user_email' => $user_email])->get();
             foreach($cartProducts as $product){
                 $cartProduct = new OrderProduct;
@@ -701,7 +701,12 @@ class ProductController extends Controller
     public function thanks(Request $request)
     {
         DB::table('cart')->where('user_email', auth()->user()->email)->delete();
-        return view('products.thanks');
+        return view('orders.thanks');
+    }
+
+    public function paypal(Request $request)
+    {
+        return view('orders.paypal');
     }
 
     public function userOrders()

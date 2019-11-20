@@ -82,6 +82,8 @@ Route::group(['middleware' => ['FrontLogin']], function(){
     Route::match(['get', 'post'], '/place-order', 'ProductController@placeOrder');
     // Thank you Page
     Route::get('/thanks', 'ProductController@thanks');
+    // Paypal Page
+    Route::get('/paypal', 'ProductController@paypal');
     // User Ordered Page
     Route::get('/orders', 'ProductController@userOrders');
     // User Ordered Products Page
