@@ -383,8 +383,10 @@ class ProductController extends Controller
         Session::forget('CouponAmount');
         Session::forget('CouponCode');
 
-        if(empty($request->user_email)){
+        if(empty(Auth::user()->email)){
             $request->user_email = '';
+        } else {
+            $request->user_email = Auth::user()->email;
         }
 
         //if(empty($request->session_id)){
@@ -650,7 +652,7 @@ class ProductController extends Controller
             if(empty($request->shipping_charges)){
                 $request->shipping_charges = '0.00';
             }
-
+            // Order consist of customer shipping details
             $shippingDetails = DeliveryAddress::where(['user_email' => $user_email])->first();
             $order = new Order;
             $order->user_id = $user_id;
@@ -670,13 +672,18 @@ class ProductController extends Controller
             $order->grand_total = $request->grand_total;
             $order->save();
 
+            // Get the last insert ID for our order
             $order_id = DB::getPdo()->lastInsertId();
+
 
             $cartProducts = DB::table('cart')->where(['user_email' => $user_email])->get();
             foreach($cartProducts as $product){
                 $cartProduct = new OrderProduct;
+                // From last insert ID of Order to OrderProduct
                 $cartProduct->order_id = $order_id;
+                // Can be auth()->id();
                 $cartProduct->user_id = $user_id;
+                // From Cart to OrderProduct
                 $cartProduct->product_id = $product->product_id;
                 $cartProduct->product_code = $product->product_code;
                 $cartProduct->product_name = $product->product_name;
@@ -686,7 +693,27 @@ class ProductController extends Controller
                 $cartProduct->product_qty = $product->quantity;
                 $cartProduct->save();
             }
+            Session::put('order_id', $order_id);
+            Session::put('grand_total', $request->grand_total);
+            return redirect('/thanks');
         }
+    }
+    public function thanks(Request $request)
+    {
+        DB::table('cart')->where('user_email', auth()->user()->email)->delete();
+        return view('products.thanks');
+    }
+
+    public function userOrders()
+    {
+        $orders = Order::where('user_id', auth()->id())->orderBy('id', 'DESC')->get();
+        return view('orders.user_orders', compact('orders'));
+    }
+
+    public function userOrderDetails($order_id)
+    {
+        $orderDetails = Order::with('orders')->where('user_id', auth()->id())->where('id', $order_id)->first();
+        return view('orders.user_order_details', compact('orderDetails'));
     }
 }
  

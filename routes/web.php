@@ -68,12 +68,24 @@ Route::match(['get', 'post'], '/check-email', 'UserController@checkEmail');
 
 // User Account Page
 Route::group(['middleware' => ['FrontLogin']], function(){
+    // User Account Page
     Route::match(['get', 'post'], '/account', 'UserController@account');
+    // Update User Password
     Route::match(['get', 'post'], '/update-user-pwd', 'UserController@updatePassword');
+    // Check User Password
     Route::post('/check-user-pwd', 'UserController@chkUserPassword');
+    // Order Review Page
     Route::match(['get', 'post'], '/checkout', 'ProductController@checkout');
+    // Order Review Page
     Route::match(['get', 'post'], '/order-review', 'ProductController@orderReview');
+    // Place Order 
     Route::match(['get', 'post'], '/place-order', 'ProductController@placeOrder');
+    // Thank you Page
+    Route::get('/thanks', 'ProductController@thanks');
+    // User Ordered Page
+    Route::get('/orders', 'ProductController@userOrders');
+    // User Ordered Products Page
+    Route::get('/orders/{id}', 'ProductController@userOrderDetails');
 });
 
 
