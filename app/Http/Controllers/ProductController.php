@@ -695,7 +695,13 @@ class ProductController extends Controller
             }
             Session::put('order_id', $order_id);
             Session::put('grand_total', $request->grand_total);
-            return redirect('/thanks');
+            if($request->payment_method == "COD"){
+                return redirect('/thanks');
+            } else {
+                return redirect('/paypal');
+            }
+            // COD - redirect user to thanks page after saving order
+            
         }
     }
     public function thanks(Request $request)
@@ -706,6 +712,7 @@ class ProductController extends Controller
 
     public function paypal(Request $request)
     {
+        DB::table('cart')->where('user_email', auth()->user()->email)->delete();
         return view('orders.paypal');
     }
 
