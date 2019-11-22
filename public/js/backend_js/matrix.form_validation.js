@@ -1,4 +1,3 @@
-
 $(document).ready(function(){
 	
 	$("#current_pwd").keyup(function(){
@@ -7,11 +6,13 @@ $(document).ready(function(){
 			type: 'get',
 			url: '/admin/check-pwd',
 			data: {current_pwd: current_pwd},
+			dataType: 'text',
 			success: function(response) {
+				console.log(response);
 				if(response == "false") {
-					$('#chkPwd').html("<font color='red'>Current Password is Incorrect</font>");
+					$("#chkPwd").html("<font color='red'>Current Password is Incorrect</font>");
 				} else if (response == "true") {
-					$('#chkPwd').html("<font color='green'>Current Password is Correct</font>")
+					$("#chkPwd").html("<font color='green'>Current Password is Correct</font>");
 				}
 			},
 			error: function(){

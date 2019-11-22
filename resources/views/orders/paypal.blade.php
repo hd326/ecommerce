@@ -32,7 +32,7 @@
                 <input type="text" name="cmd" value="_xclick">
                 <input type="text" name="business" value="r_duong89@yahoo.com">
                 <input type="text" name="item_name" value="{{ Session::get('order_id') }}">
-                <input type="text" name="currency_code" value="US">
+                <input type="text" name="currency_code" value="USD">
                 <input type="text" name="amount" value="{{ Session::get('grand_total') }}">
                 <input type="text" name="first_name" value="{{ $orderDetails->name }}">
                 <input type="text" name="address1" value="{{ $orderDetails->address }}">

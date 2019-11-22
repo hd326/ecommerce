@@ -9,6 +9,7 @@ use DB;
 use Auth;
 use Session;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -28,15 +29,33 @@ class UserController extends Controller
             $user->email = $request->email;
             $user->password = bcrypt($request->password);
             $user->save();
-            if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
-                Session::put('frontSession', $request->email);
-                // unique email
-                if(!empty(Session::get('session_id'))){
-                    $session_id = Session::get('session_id');
-                    DB::table('cart')->where('session_id',$session_id)->update(['user_email' => $request->email]);
-                }
-                return redirect('/cart');
-            }
+
+            // Send Register Email
+            //$email = $request->email;
+            //$messageData = ['email' => $request->email, 'name' => $request->name];
+            //// This is the data we are able to use within the email itself
+            //Mail::send('emails.register', $messageData, function($message) use ($email){
+            //    $message->to($email)->subject('Registration with E-Commerce Website');
+            //});
+
+            // Send Confirmation Email
+            $email = $request->email;
+            $messageData = ['email' => $request->email, 'name' => $request->name, 'code' => base64_encode($request->email)];
+            Mail::send('emails.confirmation', $messageData, function($message) use ($email){
+                $message->to($email)->subject('Confirm your E-Commerce Account');
+            });
+
+            return redirect()->back()->with('flash_message_success','Please confirm your email to activate your account!');
+
+            //if(Auth::attempt(['email' => $request->email, 'password' => $request->password])){
+            //    Session::put('frontSession', $request->email);
+            //    // unique email
+            //    if(!empty(Session::get('session_id'))){
+            //        $session_id = Session::get('session_id');
+            //        DB::table('cart')->where('session_id',$session_id)->update(['user_email' => $request->email]);
+            //    }
+            //    return redirect('/cart');
+            //}
         }
     }
     
@@ -44,6 +63,7 @@ class UserController extends Controller
     {
         Auth::logout();
         Session::forget('frontSession');
+        Session::forget('session_id');
         return redirect('/');
     }
 
@@ -51,6 +71,11 @@ class UserController extends Controller
     {
         if($request->isMethod('post')){
             if(Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                $userStatus = User::where('email', $request->email)->first();
+                if($userStatus->status == 0){
+                    return redirect()->back()->with('flash_message_error', 'Your account is not activated! Please confirm your email to activate.');
+                }
+                // once we auth attempt the email / password, we initiate a session used by our middleware as authorization to routes
                 Session::put('frontSession', $request->email);
                 if(!empty(Session::get('session_id'))){
                     $session_id = Session::get('session_id');
@@ -151,5 +176,31 @@ class UserController extends Controller
             }
     }
 
+    public function confirmAccount($email)
+    {
+        $email = base64_decode($email);
+        // make the email token back into our email
+        $userCount = User::where('email',$email)->count();
+        // confirm that there is a user with such an email in our system and return a value
+        if($userCount > 0){
+            $userDetails = User::where('email',$email)->first();
+            // check if status is already 1
+            if($userDetails->status == 1){
+                return redirect('login-register')->with('flash_message_success','Your Email account is already activated. You can login now.');
+            }else{
+                // update user status to 1 with where our decoded email
+                User::where('email', $email)->update(['status' => 1]);
+                // Send Welcome Email
 
+                $messageData = ['email' => $email,'name' => $userDetails->name];
+                Mail::send('emails.welcome',$messageData,function($message) use($email){
+                    $message->to($email)->subject('Welcome to E-Commerce Website');
+                });
+
+                return redirect('login-register')->with('flash_message_success','Your Email account is activated. You can login now.');
+            }
+        } else {
+            abort(404);
+        }
+    }
 }

@@ -653,6 +653,7 @@ class ProductController extends Controller
                 $request->shipping_charges = '0.00';
             }
             // Order consist of customer shipping details from the Delivery Address as instantiated in checkout
+            // We use the order for shipping details by virtue of Delivery Address 
             $shippingDetails = DeliveryAddress::where(['user_email' => $user_email])->first();
             $order = new Order;
             $order->user_id = $user_id;
@@ -710,10 +711,20 @@ class ProductController extends Controller
         return view('orders.thanks');
     }
 
+    public function thanksPaypal()
+    {
+        return view('orders.thanks_paypal');
+    }
+
     public function paypal(Request $request)
     {
         DB::table('cart')->where('user_email', auth()->user()->email)->delete();
         return view('orders.paypal');
+    }
+
+    public function cancelPaypal()
+    {
+        return view('orders.cancel_paypal');
     }
 
     public function userOrders()
@@ -726,6 +737,27 @@ class ProductController extends Controller
     {
         $orderDetails = Order::with('orders')->where('user_id', auth()->id())->where('id', $order_id)->first();
         return view('orders.user_order_details', compact('orderDetails'));
+    }
+
+    public function viewOrders()
+    {
+        $orders = Order::with('orders')->orderBy('id', 'desc')->get();
+        return view('admin.orders.view_orders', compact('orders'));
+    }
+
+    public function viewOrderDetails($order_id)
+    {
+        $orderDetails = Order::with('orders')->where('id', $order_id)->first();
+        $userDetails = User::where('id', $orderDetails->user_id)->first();
+        return view('admin.orders.order_details', compact('orderDetails', 'userDetails'));
+    }
+
+    public function updateOrderStatus(Request $request)
+    {
+        if($request->isMethod('post')){
+            Order::where('id', $request->order_id)->update(['order_status' => $request->order_status]);
+            return redirect()->back()->with('flash_message_success', 'Order Status has been updated successfully!');
+        }
     }
 }
  
