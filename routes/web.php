@@ -57,6 +57,9 @@ Route::get('/login-register', 'UserController@userLoginRegister');
 // User Register Form Submit
 Route::post('/user-register', 'UserController@register');
 
+// User Forgot Password
+Route::match(['get','post'], '/forgot-password', 'UserController@forgotPassword');
+
 // Confirm Account
 Route::get('confirm/{code}', 'UserController@confirmAccount');
 
@@ -65,6 +68,8 @@ Route::get('/user-logout', 'UserController@logout');
 
 // User Login
 Route::post('/user-login', 'UserController@login');
+
+Route::post('/search-products', 'ProductController@searchProduct');
 
 // Check is User already exists
 Route::match(['get', 'post'], '/check-email', 'UserController@checkEmail');
@@ -142,8 +147,22 @@ Route::group(['middleware' => ['AdminLogin']], function() {
     // Order Details Routes
     Route::get('/admin/view-order/{id}', 'ProductController@viewOrderDetails');
 
+    // Order Invoice
+
+    Route::get('/admin/view-order-invoice/{id}', 'ProductController@viewOrderInvoice');
+
     // Update Order Status Route
     Route::post('/admin/update-order-status', 'ProductController@updateOrderStatus');
+
+    // View Users Route
+    Route::get('/admin/view-users', 'UserController@viewUsers');
+
+    Route::match(['get', 'post'], '/admin/add-cms-page', 'CmsController@addCmsPage');
+    Route::get('/admin/view-cms-pages', 'CmsController@viewCmsPages');
+    Route::match(['get', 'post'], '/admin/edit-cms-page/{id}', 'CmsController@editCmsPage');
+    Route::get('/admin/delete-cms-page/{id}', 'CmsController@deleteCmsPage');
 });
 
 Route::get('/logout', 'AdminController@logout');
+
+Route::get('/page/{url}', 'CmsController@cmsPage');

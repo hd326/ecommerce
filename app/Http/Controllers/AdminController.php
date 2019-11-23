@@ -49,9 +49,9 @@ class AdminController extends Controller
         //$data = $request->all();
         $adminCount = Admin::where(['username' => Session::get('adminSession'), 'password' => md5($request->current_pwd), 'status' => 1])->count();
         if($adminCount == 1){
-            echo 'true'; die;
+            return response()->json('true');
         } else {
-            echo 'false'; die;
+            return response()->json('false');
         }
     }
 

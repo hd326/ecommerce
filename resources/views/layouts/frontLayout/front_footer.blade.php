@@ -115,6 +115,7 @@
                             <li><a href="#">Refund Policy</a></li>
                             <li><a href="#">Billing System</a></li>
                             <li><a href="#">Ticket System</a></li>
+                            <li><a href="{{ url('/page/test') }}">Test</a></li>
                         </ul>
                     </div>
                 </div>

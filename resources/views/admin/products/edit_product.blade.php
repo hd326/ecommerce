@@ -114,7 +114,14 @@
             <label class="control-label">Enable:</label>
             <div class="controls">
                 <input type="checkbox" name="status" id="status" @if($product->status == 1) checked @endif
-                    value="1">
+                value="1">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label">Feature Item:</label>
+            <div class="controls">
+                <input type="checkbox" name="feature_item" id="status" @if($product->feature_item == 1) checked @endif
+                value="1">
             </div>
         </div>
         <div class="form-actions">

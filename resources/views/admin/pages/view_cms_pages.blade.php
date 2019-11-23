@@ -5,8 +5,8 @@
 <div id="content">
     <div id="content-header">
         <div id="breadcrumb"> <a href="#" title="Go to Home" class="tip-bottom"><i class="icon-home"></i> Home</a> <a
-                href="#" class="current">View Orders</a> </div>
-        <h1>Orders</h1>
+                href="#" class="current">View Products</a> </div>
+        <h1>Products</h1>
         @if(Session::has('flash_message_error'))
         <div class="alert alert-error alert-block">
             <button type="button" class="close" data-dismiss="alert">x</button>
@@ -26,47 +26,35 @@
             <div class="span12">
                 <div class="widget-box">
                     <div class="widget-title"> <span class="icon"><i class="icon-th"></i></span>
-                        <h5>View Orders</h5>
+                        <h5>View Products</h5>
                     </div>
                     <div class="widget-content nopadding">
                         <table class="table table-bordered data-table">
                             <thead>
                                 <tr>
-                                    <th>Order ID</th>
-                                    <th>Order Date</th>
-                                    <th>Customer Name</th>
-                                    <th>Customer Email</th>
-                                    <th>Ordered Products</th>
-                                    <th>Order Amount</th>
-                                    <th>Order Status</th>
-                                    <th>Payment Method</th>
+                                    <th>CMS Page ID</th>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>URL</th>
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach($orders as $order)
+                                @foreach($cmsPages as $cmsPage)
                                 <tr class="gradeX">
-                                    <td>{{ $order->id }}</td>
-                                    <td>{{ $order->created_at }}</td>
-                                    <td>{{ $order->name }}</td>
-                                    <td>{{ $order->user_email }}</td>
-                                    <td>
-                                        @foreach($order->orders as $product)
-                                        {{ $product->product_code }}({{$product->product_qty}})<br>
-                                        @endforeach
-                                    </td>
-                                    <td>{{ $order->grand_total }}</td>
-                                    <td>{{ $order->order_status }}</td>
-                                    <td>
-                                        {{ $order->payment_method }}
-                                    </td>
+                                    <td>{{ $cmsPage->id }}</td>
+                                    <td>{{ $cmsPage->title }}</td>
+                                    <td>{{ $cmsPage->description }}</td>
+                                    <td>{{ $cmsPage->url }}</td>
+                                    <td>{{ $cmsPage->status }}</td>
                                     <td class="center">
-                                        <a href="{{ url('/admin/view-order/'.$order->id) }}" class="btn btn-success btn-mini">View Order Details</a>
-                                        <a href="{{ url('/admin/view-order-invoice/'.$order->id) }}" class="btn btn-success btn-mini">View Order Invoice</a>
-
+                                        <a href="{{ url('/admin/edit-cms-page/' . $cmsPage->id) }}"
+                                            class="btn btn-primary btn-mini" title="Edit Product">Edit</a>
+                                        <a id="delCmsPage" href="{{ url('/admin/delete-cms-page/' . $cmsPage->id) }}"
+                                            class="btn btn-danger btn-mini" title="Delete Product">Delete</a>
                                     </td>
                                 </tr>
-
                                 @endforeach
                             </tbody>
 

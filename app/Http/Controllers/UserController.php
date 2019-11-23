@@ -22,7 +22,7 @@ class UserController extends Controller
     {
         $userCount = User::where('email', $request->email)->count();
         if($userCount>0){
-            return redirect()->back()->with('flash_message_error', ' Email already exists!');
+            return redirect()->back()->with('flash_message_error', 'Email already exists!');
         } else {
             $user = new User;
             $user->name = $request->name;
@@ -57,6 +57,34 @@ class UserController extends Controller
             //    return redirect('/cart');
             //}
         }
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        if($request->isMethod('post')){
+            $email = $request->email;
+            $userCount = User::where('email', $email)->count();
+            if($userCount == 0){
+                return redirect()->back()->with('flash_message_error', 'Email does not exist!');
+            } else {
+                $userDetails = User::where('email', $email)->first();
+
+                $random_password = str_random(8);
+
+                $new_password = bcrypt($random_password);
+
+                User::where('email', $email)->update(['password' => $new_password]);
+
+                $messageData = ['name' => $userDetails->name, 'new_password' => $random_password];
+
+                Mail::send('emails.forgot_password', $messageData, function($message) use ($email){
+                    $message->to($email)->subject('Your temporary password for E-Commerce Website');
+                });
+
+                return redirect('/login-register')->with('flash_message_success', 'Your new password has been sent to your email!');
+            }
+        }
+        return view('users.forgot_password');
     }
     
     public function logout()
@@ -202,5 +230,11 @@ class UserController extends Controller
         } else {
             abort(404);
         }
+    }
+
+    public function viewUsers()
+    {
+        $users = User::all();
+        return view('admin.users.view_users', compact('users'));
     }
 }

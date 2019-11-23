@@ -34,6 +34,17 @@
           <li @if(preg_match('/view-banners/i', $url)) class="active" @endif><a href="{{ url('/admin/view-banners') }}">View Banners</a></li>
         </ul>
       </li>
+      <li class="submenu"> <a href="#"><i class="icon icon-th-list"></i> <span>Users</span> <span class="label label-important"></span></a>
+        <ul @if(preg_match('/user/i', $url)) style="display:block;" @endif>
+          <li @if(preg_match('/view-users/i', $url)) class="active" @endif><a href="{{ url('/admin/view-users') }}">View Users</a></li>
+        </ul>
+      </li>
+      <li class="submenu"> <a href="#"><i class="icon icon-th-list"></i> <span>CMS Pages</span> <span class="label label-important"></span></a>
+        <ul @if(preg_match('/cms-page/i', $url)) style="display:block;" @endif>
+          <li @if(preg_match('/add-cms-page/i', $url)) class="active" @endif><a href="{{ url('/admin/add-cms-page') }}">Add CMS Page</a></li>
+          <li @if(preg_match('/view-cms-pages/i', $url)) class="active" @endif><a href="{{ url('/admin/view-cms-pages') }}">View CMS Pages</a></li>
+        </ul>
+      </li>
     </ul>
   </div>
   <!--sidebar-menu-->

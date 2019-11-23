@@ -28,7 +28,8 @@
                         <h5>Add Product</h5>
                     </div>
                     <div class="widget-content nopadding">
-                        <form enctype="multipart/form-data" class="form-horizontal" method="post" action="{{ url('/admin/add-product') }}" name="add_product" id="add_product"
+                        <form enctype="multipart/form-data" class="form-horizontal" method="post"
+                            action="{{ url('/admin/add-product') }}" name="add_product" id="add_product"
                             novalidate="novalidate">
                             {{ csrf_field() }}
                             <div class="control-group">
@@ -85,6 +86,12 @@
                                 <label class="control-label">Enable:</label>
                                 <div class="controls">
                                     <input type="checkbox" name="status" id="status" value="1">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Featured Item:</label>
+                                <div class="controls">
+                                    <input type="checkbox" name="feature_item" id="status" value="1">
                                 </div>
                             </div>
                             <div class="form-actions">

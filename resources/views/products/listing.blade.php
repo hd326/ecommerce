@@ -80,13 +80,19 @@
 <section>
     <div class="container">
         <div class="row">
-                <div class="col-sm-3">
-            @include('layouts.frontLayout.front_sidebar')
-                </div>
+            <div class="col-sm-3">
+                @include('layouts.frontLayout.front_sidebar')
+            </div>
             <div class="col-sm-9 padding-right">
                 <div class="features_items">
                     <!--features_items-->
-                    <h2 class="title text-center">{{ $categoryDetails->name }}</h2>
+                    <h2 class="title text-center">
+                        @if(!empty($search_product))
+                        {{ $search_product }} Item
+                        @else
+                        {{ $categoryDetails->name }} Items
+                        @endif
+                    </h2>
                     @foreach($products as $product)
                     <div class="col-sm-4">
                         <div class="product-image-wrapper">
@@ -119,6 +125,7 @@
                 </div>
             </div>
             @endforeach
+            <div align="center">{{ $products->links() }}</div>
         </div>
     </div>
     <!--features_items-->

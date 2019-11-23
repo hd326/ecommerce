@@ -20,16 +20,15 @@
             <div class="col-sm-4 col-sm-offset-1">
                 <div class="login-form"><!--login form-->
                     <h2>Login to your account</h2>
-                    <form id="loginForm" name="loginForm" action="{{ url('/user-login') }}" method="POST">
+                    <form id="forgotPasswordForm" name="forgotPasswordForm" action="{{ url('/forgot-password') }}" method="POST">
                         {{ csrf_field() }}
-                        <input name="email" type="email" placeholder="Email Address" />
-                        <input name="password" type="password" placeholder="Password" />
+                        <input name="email" type="email" placeholder="Email Address" required/>
                         {{-- <span>
                             <input type="checkbox" class="checkbox"> 
                             Keep me signed in
                         </span> --}}
-                        <button type="submit" class="btn btn-default">Login</button>
-                        <a href="{{ url('/forgot-password') }}">Forgot Password</a>
+                        <button type="submit" class="btn btn-default">Submit</button>
+                        
                     </form>
                 </div><!--/login form-->
             </div>

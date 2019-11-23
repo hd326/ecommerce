@@ -16,6 +16,7 @@ use App\OrderProduct;
 use Auth;
 use Session;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Mail;
 use Image;
 use DB;
 
@@ -75,6 +76,16 @@ class ProductController extends Controller
                 // if there is a status, 1
                 $status = 1;
             }
+
+            if(empty($request->feature_item)){
+                $feature_item = 0;
+                // if there is no status, 0
+            } else {
+                // if there is a status, 1
+                $feature_item = 1;
+            }
+            $product->feature_item = $feature_item;
+
             $product->status = $status;
             
             $product->save();
@@ -137,6 +148,14 @@ class ProductController extends Controller
                 $status = 1;
             }
 
+            if(empty($request->feature_item)){
+                $feature_item = 0;
+                // if there is no status, 0
+            } else {
+                // if there is a status, 1
+                $feature_item = 1;
+            }
+
             Product::where('id', $id)->update([
                 'category_id' => $request->category_id,
                 'product_name' => $request->product_name,
@@ -146,6 +165,7 @@ class ProductController extends Controller
                 'care' => $request->care,
                 'price' => $request->price,
                 'image' => $filename,
+                'feature_item' => $feature_item,
                 'status' => $status
             ]);
             return redirect()->back()->with('flash_message_success', 'Product has been updated successfully!');
@@ -332,23 +352,34 @@ class ProductController extends Controller
         if($countCategory == 0) {
             abort(404);
         }
-
         // For sidebar
         $categories = Category::with('categories')->where(['parent_id' => 0])->get();
 
         // Get where URL
         $categoryDetails = Category::where(['url' => $url])->first();
-
         if($categoryDetails->parent_id == 0) {
             $subCategories = Category::where(['parent_id' => $categoryDetails->id])->get();
+            // I think it's because the relationship that categories has that we are able to do this.
             foreach($subCategories as $subcategory){
+                // Subcategory is all the children
                 $cat_ids[] = $subcategory->id;
             }
-            $products = Product::whereIn('category_id', $cat_ids)->where('status', 1)->get();
+            $products = Product::whereIn('category_id', $cat_ids)->where('status', 1)->paginate(3);
         } else {
-            $products = Product::where(['category_id' => $categoryDetails->id])->where('status', 1)->get();
+            $products = Product::where(['category_id' => $categoryDetails->id])->where('status', 1)->paginate(3);
         }
         return view('products.listing', compact('categories', 'categoryDetails', 'products'));
+    }
+
+    public function searchProduct(Request $request)
+    {
+        if($request->isMethod('post')){
+            $categories = Category::with('categories')->where(['parent_id' => 0])->get();
+            $search_product = $request->product;
+            $products = Product::where('product_name', 'like', '%'.$search_product.'%')
+                ->orWhere('product_code', $search_product)->where('status', 1)->get();
+            return view('products.listing', compact('categories', 'products', 'search_product'));
+        }
     }
 
     public function product($id = null)
@@ -383,6 +414,16 @@ class ProductController extends Controller
         Session::forget('CouponAmount');
         Session::forget('CouponCode');
 
+        // Check if Product Stock is available
+        $product_size = explode('-', $request->size);
+        $getProductStock = ProductsAttribute::where([
+            'product_id' => $request->product_id, 
+            'size' => $product_size[1]])->first();
+
+        if($getProductStock->stock < $request->quantity){
+            return redirect()->back()->with('flash_message_error', 'Quantity is not available!');
+        }
+
         if(empty(Auth::user()->email)){
             $request->user_email = '';
         } else {
@@ -403,36 +444,51 @@ class ProductController extends Controller
 
         $sizeArr = explode("-", $request['size']);
 
-        // Check to see if product exists in cart
-        $countProducts = DB::table('cart')->where([
-            'product_id' => $request->product_id,
-            'product_color' => $request->product_color,
-            'size' => $sizeArr[1],
-            'session_id' => $session_id
-        ])->count();
-
-        if($countProducts > 0)
-        {
-            return redirect()->back()->with('flash_message_error', 'Product already exists in Cart!');
-        } else {
-            // Add to Cart
-            $getSKU = ProductsAttribute::select('sku')->where([
+        if(empty(Auth::check())){
+            $countProducts = DB::table('cart')->where([
                 'product_id' => $request->product_id,
-                'size' => $sizeArr[1]
-                ])->first();
-
-            DB::table('cart')->insert([
-                'product_id' => $request->product_id,
-                'product_name' => $request->product_name,
-                'product_code' => $getSKU->sku,
                 'product_color' => $request->product_color,
-                'price' => $request->price,
                 'size' => $sizeArr[1],
-                'quantity' => $request->quantity,
-                'user_email' => $request->user_email,
                 'session_id' => $session_id
-            ]);
+            ])->count();
+    
+            if($countProducts > 0)
+            {
+                return redirect()->back()->with('flash_message_error', 'Product already exists in Cart!');
+            } 
+        } else {
+            $countProducts = DB::table('cart')->where([
+                'product_id' => $request->product_id,
+                'product_color' => $request->product_color,
+                'size' => $sizeArr[1],
+                'user_email' => auth()->user()->email
+            ])->count();
+    
+            if($countProducts > 0)
+            {
+                return redirect()->back()->with('flash_message_error', 'Product already exists in Cart!');
+            } 
         }
+        // Check to see if product exists in cart
+        
+            // Add to Cart
+        $getSKU = ProductsAttribute::select('sku')->where([
+            'product_id' => $request->product_id,
+            'size' => $sizeArr[1]
+            ])->first();
+
+        DB::table('cart')->insert([
+            'product_id' => $request->product_id,
+            'product_name' => $request->product_name,
+            'product_code' => $getSKU->sku,
+            'product_color' => $request->product_color,
+            'price' => $request->price,
+            'size' => $sizeArr[1],
+            'quantity' => $request->quantity,
+            'user_email' => $request->user_email,
+            'session_id' => $session_id
+        ]);
+
 
         return redirect('cart')->with('flash_message_success', 'Product has been added in Cart!');
     }
@@ -548,7 +604,7 @@ class ProductController extends Controller
     {
         $userDetails = User::where('id', auth()->id())->first();
         $countries = Country::get();
-        // Check table for existing address
+        // Check Delivery Address for existing user data
         $shippingCount = DeliveryAddress::where('user_id', auth()->id())->count();
         if($shippingCount > 0) {
             // Pull data for existing address
@@ -578,7 +634,7 @@ class ProductController extends Controller
             empty($request->shipping_mobile)){
                 return redirect()->back()->with('flash_message_error', 'Please fill out all fields to Checkout!');
             }
-            // Update user details with specified billing information
+            // User gets updated with billing information (it's not necessary when user signs up)
             User::where('id', auth()->id())->update([
                 'name' => $request->billing_name,
                 'address' => $request->billing_address,
@@ -588,7 +644,7 @@ class ProductController extends Controller
                 'zipcode' => $request->billing_zipcode,
                 'mobile' => $request->billing_mobile
                 ]);
-                // If a shipping address exist,
+                // If a shipping address exists for user 
             if($shippingCount > 0){
                 // Update Shipping Address
                 DeliveryAddress::where('user_id', auth()->id())->update([
@@ -634,6 +690,7 @@ class ProductController extends Controller
     public function placeOrder(Request $request)
     {
         if($request->isMethod('post')){
+            // By this point, User information has been populated in checkout post
             $user_id = Auth::user()->id;
             $user_email = Auth::user()->email;
 
@@ -697,11 +754,29 @@ class ProductController extends Controller
             Session::put('order_id', $order_id);
             Session::put('grand_total', $request->grand_total);
             if($request->payment_method == "COD"){
+                // Order Email
+                $productDetails = Order::with('orders')->where('id', $order_id)->first();
+                $userDetails = User::where('id', auth()->id())->first();
+                $email = auth()->user()->email;
+                $messageData = [
+                    'email' => auth()->user()->email, 
+                    'name' => auth()->user()->name,
+                    'order_id' => $order_id,
+                    'productDetails' => $productDetails,
+                    'userDetails' => $userDetails
+                    // We can add additional details like order/product information
+                ];
+
+                Mail::send('emails.order', $messageData, function($message) use ($email){
+                    $message->to($email)->subject('Order Place - E-Commerce Website');
+                });
+
+                // COD - redirect user to thanks page after saving order
                 return redirect('/thanks');
             } else {
                 return redirect('/paypal');
             }
-            // COD - redirect user to thanks page after saving order
+            
             
         }
     }
@@ -758,6 +833,13 @@ class ProductController extends Controller
             Order::where('id', $request->order_id)->update(['order_status' => $request->order_status]);
             return redirect()->back()->with('flash_message_success', 'Order Status has been updated successfully!');
         }
+    }
+
+    public function viewOrderInvoice($order_id)
+    {
+        $orderDetails = Order::with('orders')->where('id', $order_id)->first();
+        $userDetails = User::where('id', $orderDetails->user_id)->first();
+        return view('admin.orders.order_invoice', compact('orderDetails', 'userDetails'));
     }
 }
  

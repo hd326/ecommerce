@@ -6,7 +6,7 @@ $(document).ready(function(){
 			type: 'get',
 			url: '/admin/check-pwd',
 			data: {current_pwd: current_pwd},
-			dataType: 'text',
+			dataType: 'JSON',
 			success: function(response) {
 				console.log(response);
 				if(response == "false") {
@@ -142,6 +142,54 @@ $(document).ready(function(){
 			$(element).parents('.control-group').addClass('success');
 		}
 	});
+
+	// Add CMS Page Validation
+
+	$("#add_cms_page").validate({
+		rules:{
+			title:{
+				required:true
+			},
+			description:{
+				required:true,
+			},
+			url:{
+				required:true,
+			},
+		},
+		errorClass: "help-inline",
+		errorElement: "span",
+		highlight:function(element, errorClass, validClass) {
+			$(element).parents('.control-group').addClass('error');
+		},
+		unhighlight: function(element, errorClass, validClass) {
+			$(element).parents('.control-group').removeClass('error');
+			$(element).parents('.control-group').addClass('success');
+		}
+	});
+
+	$("#edit_cms_page").validate({
+		rules:{
+			title:{
+				required:true
+			},
+			description:{
+				required:true,
+			},
+			url:{
+				required:true,
+			},
+		},
+		errorClass: "help-inline",
+		errorElement: "span",
+		highlight:function(element, errorClass, validClass) {
+			$(element).parents('.control-group').addClass('error');
+		},
+		unhighlight: function(element, errorClass, validClass) {
+			$(element).parents('.control-group').removeClass('error');
+			$(element).parents('.control-group').addClass('success');
+		}
+	});
 	
 	$("#number_validate").validate({
 		rules:{
@@ -235,6 +283,13 @@ $(document).ready(function(){
 
 	$('#delBanner').click(function(){
 		if(confirm('Are you sure you want to delete this Banner?')){
+			return true;
+		}
+		return false;
+	});
+
+	$('#delCmsPage').click(function(){
+		if(confirm('Are you sure you want to delete this CMS Page?')){
 			return true;
 		}
 		return false;
