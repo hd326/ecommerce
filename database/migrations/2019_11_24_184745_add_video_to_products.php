@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddFeaturedItemsToProducts extends Migration
+class AddVideoToProducts extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddFeaturedItemsToProducts extends Migration
     public function up()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->tinyInteger('feature_item')->after('image')->default(0);
+            $table->string('video')->after('image')->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ class AddFeaturedItemsToProducts extends Migration
     public function down()
     {
         Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('feature_item');
+            $table->dropColumn('video');
         });
     }
 }

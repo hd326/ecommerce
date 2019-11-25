@@ -1,6 +1,6 @@
 @extends('layouts.frontLayout.front_design')
 @section('content')
-
+<?php use App\Product; ?>
 <section id="cart_items">
     <div class="container">
         <div class="container">
@@ -11,6 +11,18 @@
                 </ol>
             </div>
             <div class="row">
+                    @if(Session::has('flash_message_error'))
+                    <div class="alert alert-error alert-block" style="background-color:#d9534f">
+                        <button type="button" class="close" data-dismiss="alert">x</button>
+                        <strong>{!! session('flash_message_error') !!} </strong>
+                    </div>
+                    @endif
+                    @if(Session::has('flash_message_success'))
+                    <div class="alert alert-success alert-block">
+                        <button type="button" class="close" data-dismiss="alert">x</button>
+                        <strong>{!! session('flash_message_success') !!} </strong>
+                    </div>
+                    @endif
                 <div class="col-sm-4 col-sm-offset-1">
                     <div class="login-form">
                         <h2>Billing Details</h2>
@@ -130,13 +142,18 @@
                                     <td>
                                         @if(!empty(Session::get('CouponAmount')))
                                         USD {{ Session::get('CouponAmount') }}
-                                        @else 0
+                                        @else USD 0
                                         @endif
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>Total</td>
-                                    <td><span>{{ $grand_total = $total_amount - Session::get('CouponAmount') }}</span></td>
+                                    <td>Grand Total</td>
+                                    <?php $grand_total = $total_amount - Session::get('CouponAmount'); ?>
+                                    <?php $getCurrencyRates = Product::getCurrencyRates($total_amount); ?>
+                                    <td><span class="btn-secondary" data-toggle="tooltip" data-html="true" title="
+                                        INR {{ $getCurrencyRates['INR_Rate'] }}<br>
+                                        GBP {{ $getCurrencyRates['GBP_Rate'] }}<br>
+                                        EUR {{ $getCurrencyRates['EUR_Rate'] }}">{{ $grand_total }}</span></td>
                                 </tr>
                             </table>
                         </td>
@@ -151,6 +168,7 @@
             <span>
                 <label><strong>Select Payment Method: </strong></label>
             </span>
+            <!-- consult with 121 -->
             <span>
                 <label><input type="radio" name="payment_method" id="COD" value="COD"> <strong>COD</strong></label>
             </span>

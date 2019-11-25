@@ -92,6 +92,8 @@
                         @else
                         {{ $categoryDetails->name }} Items
                         @endif
+
+                        ({{ count($products) }})
                     </h2>
                     @foreach($products as $product)
                     <div class="col-sm-4">

@@ -21,6 +21,11 @@ class IndexController extends Controller
         $categories = Category::with('categories')->where(['parent_id' => 0])->get();
 
         $banners = Banner::where('status', '1')->get();
-        return view('index', compact('products', 'categories', 'banners'));
+
+        // Meta Tags
+        $meta_title = "E-shop Sample Website";
+        $meta_description = "Online Shopping Site for Men, Women, and Kids Clothing";
+        $meta_keywords = "Eshop website, online shopping, men clothing";
+        return view('index', compact('products', 'categories', 'banners', 'meta_title', 'meta_description', 'meta_keywords'));
     }
 }

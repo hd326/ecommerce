@@ -36,7 +36,14 @@
                                 <label class="control-label">Under Category:</label>
                                 <div class="controls">
                                     <select name="category_id" id="category_id" style="width: 220px;">
-                                        <?php echo $categories_dropdown ?>
+                                        <?php //echo $categories_dropdown ?> 
+                                        <option value="" selected disabled>Select</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                            @foreach($category->categories as $subcategory)
+                                            <option value="{{ $subcategory->id }}">-- {{ $subcategory->name }}</option>
+                                            @endforeach
+                                        @endforeach
                                     </select>
                                 </div>
                             </div>
@@ -80,6 +87,12 @@
                                 <label class="control-label">Image:</label>
                                 <div class="controls">
                                     <input type="file" name="image" id="image">
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Video:</label>
+                                <div class="controls">
+                                    <input type="file" name="video" id="video">
                                 </div>
                             </div>
                             <div class="control-group">

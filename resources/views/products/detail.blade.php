@@ -1,6 +1,6 @@
 @extends('layouts.frontLayout.front_design')
 @section('content')
-
+<?php use App\Product; ?>
 <section>
     <div class="container">
         <div class="row">
@@ -80,7 +80,13 @@
                                 </p>
                                 <img src="images/product-details/rating.png" alt="" />
                                 <span>
-                                    <span id="getPrice">US {{ $product->price }}</span>
+                                    <?php $getCurrencyRates = Product::getCurrencyRates($product->price); ?>
+                                    <span id="getPrice">
+                                        US {{ $product->price }}
+                                        <h2>INR {{ $getCurrencyRates['INR_Rate'] }}</h2>
+                                        <h2>GBP {{ $getCurrencyRates['GBP_Rate'] }}</h2>
+                                        <h2>EUR {{ $getCurrencyRates['EUR_Rate'] }}</h2>
+                                    </span>
                                     <label>Quantity:</label>
                                     <input name="quantity" type="text" value="1" />
                                     @if($total_stock>0)
@@ -96,6 +102,11 @@
                                 <p><b>Condition:</b> New</p>
                                 <a href=""><img src="images/product-details/share.png" class="share img-responsive"
                                         alt="" /></a>
+                                <p><b>Delivery</b></p>
+                                <input type="text" name="zipcode" id="check_zipcode" placeholder="Check Zipcode">
+                                <button type="button" onclick="return checkZipcode();">Go</button><br>
+                                <br>
+                                <p id="chkZipcode"></p>
                             </div>
                         </form>
                         <!--/product-information-->
@@ -110,6 +121,9 @@
                             <li><a href="#description" data-toggle="tab">Description</a></li>
                             <li><a href="#care" data-toggle="tab">Material & Care</a></li>
                             <li><a href="#delivery" data-toggle="tab">Material Options</a></li>
+                            @if(!empty($product->video))
+                            <li><a href="#video" data-toggle="tab">Product Video</a></li>
+                            @endif
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -124,7 +138,6 @@
                                 <p>{{ $product->care }}</p>
                             </div>
                         </div>
-
                         <div class="tab-pane fade" id="delivery">
                             <div class="col-sm-12">
                                 <p>100% Original Products<br>
@@ -132,6 +145,15 @@
                                 </p>
                             </div>
                         </div>
+                        @if(!empty($product->video))
+                        <div class="tab-pane fade" id="video">
+                            <div class="col-sm-12">
+                                <video controls width="640" height="480">
+                                    <source src="{{ url('videos/'.$product->video) }}" type="video/mp4">
+                                </video>
+                            </div>
+                        </div>
+                        @endif
                     </div>
                 </div>
                 <!--/category-tab-->

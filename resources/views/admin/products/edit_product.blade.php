@@ -109,7 +109,17 @@
                 @endif
             </div>
         </div>
-
+        <div class="control-group">
+            <label class="control-label">Video:</label>
+            <div class="controls">
+                <input type="file" name="video" id="image">
+                @if(!empty($product->video))
+                <input type="hidden" name="current_video" value="{{ $product->video }}">
+                <a target="_blank" href="{{ url('videos/'.$product->video) }}">View</a> |
+                <a href="{{ url('/admin/delete-product-video/'.$product->id) }}">Delete</a>
+                @endif
+            </div>
+        </div>
         <div class="control-group">
             <label class="control-label">Enable:</label>
             <div class="controls">

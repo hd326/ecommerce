@@ -4,8 +4,8 @@
 <div id="content">
     <div id="content-header">
         <div id="breadcrumb"> <a href="index.html" title="Go to Home" class="tip-bottom"><i class="icon-home"></i>
-                Home</a> <a href="#">CMS Pages</a> <a href="#" class="current">Add CMS Page</a> </div>
-        <h1>CMS Pages</h1>
+                Home</a> <a href="#">Currencies</a> <a href="#" class="current">Add Currency</a> </div>
+        <h1>Currency</h1>
         @if(Session::has('flash_message_error'))
         <div class="alert alert-error alert-block">
             <button type="button" class="close" data-dismiss="alert">x</button>
@@ -25,47 +25,24 @@
             <div class="span12">
                 <div class="widget-box">
                     <div class="widget-title"> <span class="icon"> <i class="icon-info-sign"></i> </span>
-                        <h5>Add CMS Page</h5>
+                        <h5>Add Currency</h5>
                     </div>
                     <div class="widget-content nopadding">
                         <form enctype="multipart/form-data" class="form-horizontal" method="post"
-                            action="{{ url('/admin/add-cms-page') }}" name="add_cms_page" id="add_cms_page"
+                            action="{{ url('/admin/add-currency') }}" name="add_currency" id="add_currency"
                             novalidate="novalidate">
                             {{ csrf_field() }}
+                            
                             <div class="control-group">
-                                <label class="control-label">Title:</label>
+                                <label class="control-label">Currency Code:</label>
                                 <div class="controls">
-                                    <input type="text" name="title" id="title" required>
+                                    <input type="text" name="currency_code" id="currency_code">
                                 </div>
                             </div>
                             <div class="control-group">
-                                <label class="control-label">Description:</label>
+                                <label class="control-label">Exchange Rate:</label>
                                 <div class="controls">
-                                    <input type="text" name="description" id="description" required>
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <label class="control-label">Meta Title:</label>
-                                <div class="controls">
-                                    <input type="text" name="meta_title" id="meta_title" required>
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <label class="control-label">Meta Description:</label>
-                                <div class="controls">
-                                    <textarea name="meta_description" id="meta_description" required></textarea>
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <label class="control-label">Meta Keywords:</label>
-                                <div class="controls">
-                                    <input type="text" name="meta_keywords" id="meta_keywords" required>
-                                </div>
-                            </div>
-                            <div class="control-group">
-                                <label class="control-label">URL:</label>
-                                <div class="controls">
-                                    <input type="text" name="url" id="url" required>
+                                    <input type="text" name="exchange_rate" id="exchange_rate">
                                 </div>
                             </div>
                             <div class="control-group">
@@ -75,7 +52,7 @@
                                 </div>
                             </div>
                             <div class="form-actions">
-                                <input type="submit" value="Add Product" class="btn btn-success">
+                                <input type="submit" value="Add Currency" class="btn btn-success">
                             </div>
                         </form>
                     </div>

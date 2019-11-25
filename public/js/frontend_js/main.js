@@ -43,8 +43,9 @@ $(document).ready(function () {
             },
             success: function (response) {
                 var arr = response.split('#');
-                $("#getPrice").html("US" + arr[0]);
-                $("#price").val(arr[0]);
+                var arr1 = arr[0].split('-');
+                $("#getPrice").html("US" + arr1[0] + "<br><h2>INR "+arr1[1]+"<br>GDP "+arr1[2]+"<br>EUR "+arr1[3]+"</h2>");
+                $("#price").val(arr1[0]);
                 if(arr[1] == 0) {
                     $('#getCart').hide();
                     $('#getAvailability').text("Out of Stock");
@@ -248,6 +249,28 @@ $().ready(function(){
         });
     });
 
+    //$("#check_zipcode").keyup(function(){
+    //    var zipcode = $(this).val();
+    //    $.ajax({
+    //        headers: {
+    //            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    //        },
+    //        type: 'get',
+    //        url: '/check-zipcode',
+    //        data: {zipcode: zipcode},
+    //        dataType: 'JSON',
+    //        success: function(response){
+    //            if(response == "false"){
+    //                $("#chkZipcode").html("<font color='red'>This is an invalid zipcode.</font>");
+    //            } else if(response == "true") {
+    //                $("#chkZipcode").html("<font color='green'>This zip code is a valid.</font>");
+    //            }
+    //        },
+    //        error: function(){
+    //        }
+    //    });
+    //});
+
     $('#myPassword').passtrength({
         tooltip:true,
         textWeak:"Weak",
@@ -288,3 +311,28 @@ function selectPaymentMethod(){
         return false;
     }
 }
+
+ function checkZipcode(){
+     if(zipcode == ''){
+         alert("Please enter a zip code");
+     }
+     var zipcode = $("#check_zipcode").val();
+    $.ajax({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        type: 'get',
+        url: '/check-zipcode',
+        data: {zipcode: zipcode},
+        dataType: 'JSON',
+        success: function(response){
+            if(response == "false"){
+                $("#chkZipcode").html("<font color='red'>This is an invalid zipcode.</font>");
+            } else if(response == "true") {
+                $("#chkZipcode").html("<font color='green'>This zip code is a valid.</font>");
+            }
+        },
+        error: function(){
+        }
+    });
+ }

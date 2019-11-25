@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\Country;
+use App\Zipcode;
 use DB;
 use Auth;
 use Session;
@@ -15,7 +16,9 @@ class UserController extends Controller
 {
     public function userLoginRegister(Request $request)
     {
-        return view('users.login_register');
+        $meta_title = "User Login/Register E-com Website";
+
+        return view('users.login_register', compact('meta_title'));
     }
 
     public function register(Request $request)
@@ -202,6 +205,16 @@ class UserController extends Controller
             } else {
                 echo "true"; die;
             }
+    }
+
+    public function checkZipcode(Request $request)
+    {
+        $zipCount = Zipcode::where('code', $request->zipcode)->count();
+        if($zipCount > 0){
+            return response()->json('true');
+        } else {
+            return response()->json('false');
+        }
     }
 
     public function confirmAccount($email)

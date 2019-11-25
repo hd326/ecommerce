@@ -22,6 +22,9 @@ class CategoryController extends Controller
             $category->name = $request->category_name;
             $category->parent_id = $request->parent_id;
             $category->description = $request->description;
+            $category->meta_title = $request->meta_title;
+            $category->meta_description = $request->meta_description;
+            $category->meta_keywords = $request->meta_keywords;
             $category->url = $request->url;
             $category->status = $status;
             $category->save();
@@ -43,6 +46,9 @@ class CategoryController extends Controller
             Category::where('id', $id)->update([
                 'name' => $request->category_name,
                 'description' => $request->description,
+                'meta_title' => $request->meta_title,
+                'meta_description' => $request->meta_description,
+                'meta_keywords' => $request->meta_keywords,
                 'url' => $request->url,
                 'status' => $status
             ]);

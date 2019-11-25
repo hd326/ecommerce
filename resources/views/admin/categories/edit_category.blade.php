@@ -45,18 +45,40 @@
                                 </div>
                             </div>
                             <div class="control-group">
+                                <label class="control-label">Meta Title:</label>
+                                <div class="controls">
+                                    <input type="text" name="meta_title" id="meta_title"
+                                        value="{{ $category->meta_title }}">
+                                </div>
+                            </div>
+
+                            <div class="control-group">
+                                <label class="control-label">Meta Description:</label>
+                                <div class="controls">
+                                    <textarea name="meta_description"
+                                        id="meta_description">{{ $category->meta_description }}</textarea>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label">Meta Keywords:</label>
+                                <div class="controls">
+                                    <input type="text" name="meta_keywords" id="meta_keywords"
+                                        value="{{ $category->meta_keywords }}">
+                                </div>
+                            </div>
+                            <div class="control-group">
                                 <label class="control-label">URL:</label>
                                 <div class="controls">
                                     <input type="text" name="url" id="url" value="{{ $category->url }}">
                                 </div>
                             </div>
-
                             <div class="control-group">
-                                    <label class="control-label">Enable:</label>
-                                    <div class="controls">
-                                        <input type="checkbox" name="status" id="status" @if($category->status == 1) checked @endif value="1">
-                                    </div>
+                                <label class="control-label">Enable:</label>
+                                <div class="controls">
+                                    <input type="checkbox" name="status" id="status" @if($category->status == 1) checked
+                                    @endif value="1">
                                 </div>
+                            </div>
 
                             <div class="form-actions">
                                 <input type="submit" value="Validate" class="btn btn-success">

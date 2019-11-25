@@ -74,6 +74,8 @@ Route::post('/search-products', 'ProductController@searchProduct');
 // Check is User already exists
 Route::match(['get', 'post'], '/check-email', 'UserController@checkEmail');
 
+Route::get('/check-zipcode', 'UserController@checkZipcode');
+
 // User Account Page
 Route::group(['middleware' => ['FrontLogin']], function(){
     // User Account Page
@@ -122,6 +124,7 @@ Route::group(['middleware' => ['AdminLogin']], function() {
     Route::get('/admin/delete-product/{id}', 'ProductController@deleteProduct');
     Route::get('/admin/delete-product-image/{id}', 'ProductController@deleteProductImage');
     Route::get('/admin/delete-alt-image/{id}', 'ProductController@deleteAltImage');
+    Route::get('/admin/delete-product-video/{id}', 'ProductController@deleteProductVideo');
 
     // Products Attributes Routes
     Route::match(['get', 'post'], 'admin/add-attributes/{id}', 'ProductController@addAttributes');
@@ -148,7 +151,6 @@ Route::group(['middleware' => ['AdminLogin']], function() {
     Route::get('/admin/view-order/{id}', 'ProductController@viewOrderDetails');
 
     // Order Invoice
-
     Route::get('/admin/view-order-invoice/{id}', 'ProductController@viewOrderInvoice');
 
     // Update Order Status Route
@@ -157,12 +159,23 @@ Route::group(['middleware' => ['AdminLogin']], function() {
     // View Users Route
     Route::get('/admin/view-users', 'UserController@viewUsers');
 
+    // CMS Pages
     Route::match(['get', 'post'], '/admin/add-cms-page', 'CmsController@addCmsPage');
     Route::get('/admin/view-cms-pages', 'CmsController@viewCmsPages');
     Route::match(['get', 'post'], '/admin/edit-cms-page/{id}', 'CmsController@editCmsPage');
     Route::get('/admin/delete-cms-page/{id}', 'CmsController@deleteCmsPage');
+
+    // Currency Pages
+    Route::match(['get', 'post'], '/admin/add-currency', 'CurrencyController@addCurrency');
+    Route::get('/admin/view-currencies', 'CurrencyController@viewCurrencies');
+    Route::match(['get', 'post'], '/admin/edit-currency/{id}', 'CurrencyController@editCurrency');
+    Route::get('/admin/delete-currency/{id}', 'CurrencyController@deleteCurrency');
 });
 
 Route::get('/logout', 'AdminController@logout');
 
+Route::match(['get', 'post'], '/page/contact', 'CmsController@contact');
+
 Route::get('/page/{url}', 'CmsController@cmsPage');
+
+

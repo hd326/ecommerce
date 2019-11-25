@@ -13,6 +13,7 @@ use App\Country;
 use App\DeliveryAddress;
 use App\Order;
 use App\OrderProduct;
+use App\Zipcode;
 use Auth;
 use Session;
 use Illuminate\Support\Facades\Input;
@@ -69,6 +70,16 @@ class ProductController extends Controller
                 }
             }
 
+            // Upload Video
+            if($request->hasFile('video')){
+                $video_tmp = Input::file('video');
+                $video_name = $video_tmp->getClientOriginalName();
+                // this is assumed to be in public folder
+                $video_path = '/videos/';
+                $video_tmp->move($video_path, $video_name);
+                $product->video = $video_name;
+            }
+
             if(empty($request->status)){
                 $status = 0;
                 // if there is no status, 0
@@ -94,16 +105,18 @@ class ProductController extends Controller
         }
         // Categories drop down start
         $categories = Category::where('parent_id', 0)->get();
-        $categories_dropdown = "<option value='' selected disabled>Select</option>";
-        foreach($categories as $cat) {
-            $categories_dropdown .= "<option value='".$cat->id."'>".$cat->name."</option>";
-            $sub_categories = Category::where('parent_id', $cat->id)->get();
-            foreach($sub_categories as $sub_cat) {
-                $categories_dropdown .= "<option value='".$sub_cat->id."'>&nbsp;--&nbsp;".$sub_cat->name."</option>";
-            }
-        }
+        //$categories = Category::where('parent_id', 0)->get();
+        //$categories_dropdown = "<option value='' selected disabled>Select</option>";
+        //foreach($categories as $cat) {
+        //    $categories_dropdown .= "<option value='".$cat->id."'>".$cat->name."</option>";
+        //    $sub_categories = Category::where('parent_id', $cat->id)->get();
+        //    // getting 0 parent id, in consecutive order?
+        //    foreach($sub_categories as $sub_cat) {
+        //        $categories_dropdown .= "<option value='".$sub_cat->id."'>&nbsp;--&nbsp;".$sub_cat->name."</option>";
+        //    }
+        //}
         // Categories drop down ends
-        return view('admin.products.add_product')->with(compact('categories_dropdown'));
+        return view('admin.products.add_product')->with(compact('categories'));
     }
 
     public function editProduct(Request $request, $id = null)
@@ -130,6 +143,19 @@ class ProductController extends Controller
                 $filename = $request->current_image; 
             } else {
                 $filename = "";
+            }
+
+            if($request->hasFile('video')){
+                $video_tmp = Input::file('video');
+                $video_name = $video_tmp->getClientOriginalName();
+                // this is assumed to be in public folder
+                $video_path = 'videos/';
+                $video_tmp->move($video_path, $video_name);
+                $videoName = $video_name;
+            } elseif (!empty($request->current_video)) {
+                $videoName = $request->current_video; 
+            } else {
+                $videoName = "";
             }
 
             if(empty($request->description)) {
@@ -165,6 +191,7 @@ class ProductController extends Controller
                 'care' => $request->care,
                 'price' => $request->price,
                 'image' => $filename,
+                'video' => $videoName,
                 'feature_item' => $feature_item,
                 'status' => $status
             ]);
@@ -233,6 +260,17 @@ class ProductController extends Controller
 
         Product::where('id', $id)->update(['image' => '']);
         return redirect()->back()->with('flash_message_success', 'Product Image has been deleted successfully!');
+    }
+
+    public function deleteProductVideo($id = null)
+    {
+        $productVideo = Product::where('id', $id)->first();
+        $video_path = 'videos/';
+        if(file_exists($video_path.$productVideo->video)){
+            unlink($video_path.$productVideo->video);
+        }
+        Product::where('id', $id)->update(['video' => '']);
+        return redirect()->back()->with('flash_message_success', 'Product Video has been deleted successfully!');
     }
 
     public function deleteAltImage($id = null)
@@ -364,11 +402,16 @@ class ProductController extends Controller
                 // Subcategory is all the children
                 $cat_ids[] = $subcategory->id;
             }
-            $products = Product::whereIn('category_id', $cat_ids)->where('status', 1)->paginate(3);
+            $products = Product::whereIn('category_id', $cat_ids)->where('status', 1)->orderBy('id', 'desc')->paginate(6);
         } else {
-            $products = Product::where(['category_id' => $categoryDetails->id])->where('status', 1)->paginate(3);
+            $products = Product::where(['category_id' => $categoryDetails->id])->orderBy('id', 'desc')->where('status', 1)->paginate(6);
         }
-        return view('products.listing', compact('categories', 'categoryDetails', 'products'));
+
+        $meta_title = $categoryDetails->meta_title;
+        $meta_description = $categoryDetails->meta_description;
+        $meta_keywords = $categoryDetails->meta_keywords;
+
+        return view('products.listing', compact('categories', 'categoryDetails', 'products', 'meta_title', 'meta_description', 'meta_keywords'));
     }
 
     public function searchProduct(Request $request)
@@ -393,7 +436,11 @@ class ProductController extends Controller
         $categories = Category::with('categories')->where(['parent_id' => 0])->get();
         $relatedProducts = Product::where('id', '!=', $id)->where(['category_id' => $product->category_id])->where('status', 1)->get();
         $total_stock = ProductsAttribute::where('product_id', $id)->sum('stock');
-        return view('products.detail', compact('product', 'categories', 'productAltImages', 'total_stock', 'relatedProducts'));
+
+        $meta_title = $product->product_name;
+        $meta_description = $product->description;
+        $meta_keywords = $product->product_name;
+        return view('products.detail', compact('product', 'categories', 'productAltImages', 'total_stock', 'relatedProducts','meta_title', 'meta_description', 'meta_keywords'));
     }
 
     public function getProductPrice(Request $request)
@@ -404,7 +451,9 @@ class ProductController extends Controller
         //explode takes the first parameter as the divisor for values in a new array
         $productsAttribute = ProductsAttribute::where(['product_id' => $proArr[0], 'size' => $proArr[1]])->first();
         //we get the id and size from the value, use the value to send an ajax, split those values, and pull what we need
-        echo $productsAttribute->price;
+
+        $getCurrencyRates = Product::getCurrencyRates($productsAttribute->price);
+        echo $productsAttribute->price."-".$getCurrencyRates['INR_Rate']."-".$getCurrencyRates['GBP_Rate']."-".$getCurrencyRates['EUR_Rate'];
         echo "#";
         echo $productsAttribute->stock;
     }
@@ -509,7 +558,10 @@ class ProductController extends Controller
             $product = Product::where('id', $product->product_id)->first();
             $userCart[$key]->image = $product->image;
         }
-        return view('products.cart', compact('userCart'));
+        $meta_title = "Shopping Cart - E-com Website";
+        $meta_description = "View Shopping Cart of E-com Website";
+        $meta_keywords = "Shopping Cart - E-com Website";
+        return view('products.cart', compact('userCart', 'meta_title','meta_description', 'meta_keywords'));
     }
 
     public function deleteCartProduct($id = null)
@@ -634,6 +686,12 @@ class ProductController extends Controller
             empty($request->shipping_mobile)){
                 return redirect()->back()->with('flash_message_error', 'Please fill out all fields to Checkout!');
             }
+
+            $zipcodeCount = Zipcode::where('code', $request->shipping_zipcode)->count();
+            if($zipcodeCount == 0){
+                return redirect()->back()->with('flash_message_error', 'Your location is not available for delivery, please select another location.');
+            } 
+
             // User gets updated with billing information (it's not necessary when user signs up)
             User::where('id', auth()->id())->update([
                 'name' => $request->billing_name,
@@ -644,7 +702,7 @@ class ProductController extends Controller
                 'zipcode' => $request->billing_zipcode,
                 'mobile' => $request->billing_mobile
                 ]);
-                // If a shipping address exists for user 
+                // If a DeliveryAddress exists for our user
             if($shippingCount > 0){
                 // Update Shipping Address
                 DeliveryAddress::where('user_id', auth()->id())->update([
@@ -672,7 +730,8 @@ class ProductController extends Controller
             } 
             return redirect('/order-review');
         }
-        return view('products.checkout', compact('userDetails', 'countries', 'shippingDetails'));
+        $meta_title = "Checkout - E-com Website";
+        return view('products.checkout', compact('userDetails', 'countries', 'shippingDetails', 'meta_title'));
     }
 
     public function orderReview()
@@ -684,7 +743,10 @@ class ProductController extends Controller
             $product = Product::where('id', $product->product_id)->first();
             $cartDetails[$key]->image = $product->image;
         }
-        return view('products.order_review', compact('userDetails', 'shippingDetails', 'cartDetails'));
+        // $codZipcodeCount = DB::table('cod_zipcodes')->where('code', $shippingDetails->zipcode)->count();
+        // $prepaidZipcodeCount = DB::table('prepaid_zipcodes')->where('code', $shippingDetails->zipcode)->count();
+        $meta_title = "Order Review - E-com Website";
+        return view('products.order_review', compact('userDetails', 'shippingDetails', 'cartDetails', 'meta_title'));
     }
 
     public function placeOrder(Request $request)
@@ -712,6 +774,12 @@ class ProductController extends Controller
             // Order consist of customer shipping details from the Delivery Address as instantiated in checkout
             // We use the order for shipping details by virtue of Delivery Address 
             $shippingDetails = DeliveryAddress::where(['user_email' => $user_email])->first();
+
+            $zipcodeCount = Zipcode::where('code', $shippingDetails->zipcode)->count();
+            if($zipcodeCount == 0){
+                return redirect()->back()->with('flash_message_error', 'Your location is not available for delivery, please select another location.');
+            } 
+
             $order = new Order;
             $order->user_id = $user_id;
             $order->user_email = $user_email;

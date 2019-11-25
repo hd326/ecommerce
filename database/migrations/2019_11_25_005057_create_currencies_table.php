@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddFeaturedItemsToProducts extends Migration
+class CreateCurrenciesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,12 @@ class AddFeaturedItemsToProducts extends Migration
      */
     public function up()
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->tinyInteger('feature_item')->after('image')->default(0);
+        Schema::create('currencies', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('currency_code');
+            $table->decimal('exchange_rate', 8,5);
+            $table->tinyInteger('status');
+            $table->timestamps();
         });
     }
 
@@ -25,8 +29,6 @@ class AddFeaturedItemsToProducts extends Migration
      */
     public function down()
     {
-        Schema::table('products', function (Blueprint $table) {
-            $table->dropColumn('feature_item');
-        });
+        Schema::dropIfExists('currencies');
     }
 }
