@@ -18,6 +18,7 @@ use Auth;
 use Session;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Redirect;
 use Image;
 use DB;
 
@@ -407,11 +408,35 @@ class ProductController extends Controller
             $products = Product::where(['category_id' => $categoryDetails->id])->orderBy('id', 'desc')->where('status', 1)->paginate(6);
         }
 
+        if(!empty($_GET['color'])){
+            $colorArray = explode('-', $_GET['color']);
+            $products = $products->whereIn('product_color', $colorArray);
+        }
+
+        $products = $products->paginate(6);
+
         $meta_title = $categoryDetails->meta_title;
         $meta_description = $categoryDetails->meta_description;
         $meta_keywords = $categoryDetails->meta_keywords;
 
-        return view('products.listing', compact('categories', 'categoryDetails', 'products', 'meta_title', 'meta_description', 'meta_keywords'));
+        return view('products.listing', compact('categories', 'categoryDetails', 'products', 'meta_title', 'meta_description', 'meta_keywords', 'url'));
+    }
+
+    public function filter(Request $request)
+    {
+        $colorUrl = '';
+        if(!empty($request->colorFilter)){
+            foreach($request->colorFilter as $color){
+                if(empty($colorUrl)){
+                    $colorUrl = "&color=".$color;
+                } else {
+                    $colorUrl .= "-".$color;
+                }
+                
+            }
+        }
+        $finalUrl = "products/".$request->url."?".$colorUrl;
+        return redirect::to($finalUrl);
     }
 
     public function searchProduct(Request $request)
@@ -419,8 +444,14 @@ class ProductController extends Controller
         if($request->isMethod('post')){
             $categories = Category::with('categories')->where(['parent_id' => 0])->get();
             $search_product = $request->product;
-            $products = Product::where('product_name', 'like', '%'.$search_product.'%')
-                ->orWhere('product_code', $search_product)->where('status', 1)->get();
+            //$products = Product::where('product_name', 'like', '%'.$search_product.'%')
+            //    ->orWhere('product_code', $search_product)->where('status', 1)->get();
+            $products = Product::where(function($query) use ($search_product){
+                $query->where('product_name', 'like', '%'.$search_product.'%')
+                    ->orWhere('product_code', 'like', '%'.$search_product.'%')
+                    ->orWhere('description', 'like', '%'.$search_product.'%')
+                    ->orWhere('product_color', 'like', '%'.$search_product.'%');
+            })->where('status', 1)->get();
             return view('products.listing', compact('categories', 'products', 'search_product'));
         }
     }

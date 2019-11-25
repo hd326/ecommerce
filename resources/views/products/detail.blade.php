@@ -69,6 +69,7 @@
                                 <img src="images/product-details/new.jpg" class="newarrival" alt="" />
                                 <h2>{{ $product->product_name }}</h2>
                                 <p>Code: {{ $product->product_code}}</p>
+                                <p>Color: {{ $product->product_color }}</p>
                                 <p>
                                     <select id="selSize" name="size" style="width: 150px;">
                                         <option value="">Select size</option>

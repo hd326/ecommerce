@@ -51,6 +51,11 @@
           <li @if(preg_match('/view-currencies/i', $url)) class="active" @endif><a href="{{ url('/admin/view-currencies') }}">View Currency</a></li>
         </ul>
       </li>
+      <li class="submenu"> <a href="#"><i class="icon icon-th-list"></i> <span>Inquiries</span> <span class="label label-important"></span></a>
+        <ul @if(preg_match('/inquiry/i', $url)) style="display:block;" @endif>
+          <li @if(preg_match('/view-inquiries/i', $url)) class="active" @endif><a href="{{ url('/admin/view-inquiries') }}">View Inquiries</a></li>
+        </ul>
+      </li>
     </ul>
   </div>
   <!--sidebar-menu-->

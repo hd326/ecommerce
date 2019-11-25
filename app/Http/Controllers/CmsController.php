@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\CmsPage;
 use App\Category;
+use App\Inquiry;
 
 class CmsController extends Controller
 {
@@ -104,6 +105,13 @@ class CmsController extends Controller
             Mail::send('emails.inquiry', $messageData, function($message) use ($email){
                 $message->to($email)->subject('A User has contacted you! - E Commerce Website');
             });
+
+            $inquiry = new Inquiry;
+            $inquiry->name = $request->name;
+            $inquiry->email = $request->email;
+            $inquiry->subject = $request->subject;
+            $inquiry->message = $request->message;
+            $inquiry->save();
 
             return redirect()->back()->with('flash_message_success', 'Thanks for your inquiry. We will get back to you soon.');
         }
