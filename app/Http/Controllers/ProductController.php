@@ -49,7 +49,19 @@ class ProductController extends Controller
             } else {
                 $product->care = '';
             }
+
+            if(!empty($request->sleeve)){
+                $product->sleeve = $request->sleeve;
+            } else {
+                $product->sleeve = '';
+            }
             
+            if(!empty($request->pattern)){
+                $product->pattern = $request->pattern;
+            } else {
+                $product->pattern = '';
+            }
+
             $product->price = $request->price;
             
             // Upload Image
@@ -183,6 +195,14 @@ class ProductController extends Controller
                 $feature_item = 1;
             }
 
+            if(empty($request->sleeve)){
+                $request->sleeve = '';
+            }
+
+            if(empty($request->pattern)){
+                $request->pattern = '';
+            }
+
             Product::where('id', $id)->update([
                 'category_id' => $request->category_id,
                 'product_name' => $request->product_name,
@@ -190,6 +210,8 @@ class ProductController extends Controller
                 'product_color' => $request->product_color,
                 'description' => $request->description,
                 'care' => $request->care,
+                'sleeve' => $request->sleeve,
+                'pattern' => $request->pattern,
                 'price' => $request->price,
                 'image' => $filename,
                 'video' => $videoName,
@@ -403,23 +425,53 @@ class ProductController extends Controller
                 // Subcategory is all the children
                 $cat_ids[] = $subcategory->id;
             }
-            $products = Product::whereIn('category_id', $cat_ids)->where('status', 1)->orderBy('id', 'desc')->paginate(6);
+            $products = Product::whereIn('products.category_id', $cat_ids)->where('products.status', 1)->orderBy('products.id', 'desc');
         } else {
-            $products = Product::where(['category_id' => $categoryDetails->id])->orderBy('id', 'desc')->where('status', 1)->paginate(6);
+            $products = Product::where(['products.category_id' => $categoryDetails->id])->orderBy('products.id', 'desc')->where('products.status', 1);
         }
 
         if(!empty($_GET['color'])){
             $colorArray = explode('-', $_GET['color']);
-            $products = $products->whereIn('product_color', $colorArray);
+            $products = $products->whereIn('products.product_color', $colorArray);
+        }
+
+        if(!empty($_GET['sleeve'])){
+            $sleeveArray = explode('-', $_GET['sleeve']);
+            $products = $products->whereIn('products.sleeve', $sleeveArray);
+        }
+
+        if(!empty($_GET['pattern'])){
+            $patternArray = explode('-', $_GET['pattern']);
+            $products = $products->whereIn('products.pattern', $patternArray);
+        }
+
+        if(!empty($_GET['size'])){
+            $sizeArray = explode('-', $_GET['size']);
+            $products = $products->join('products_attributes','products_attributes.product_id', '=', 'products.id')
+            ->select('products.*', 'products_attributes.product_id', 'products_attributes.size')
+            ->groupBy('products_attributes.product_id')
+            ->whereIn('products_attributes.size', $sizeArray);
         }
 
         $products = $products->paginate(6);
 
+        //$colorArray = array('Black', 'Blue', 'Brown', 'Gold','Green','Orange','Pink','Purple','Red','Silver','White','Yellow');
+        $colorArray = Product::select('product_color')->groupBy('product_color')->get();
+        $colorArray = array_flatten(json_decode(json_encode($colorArray), true));
+
+        $sleeveArray = Product::select('sleeve')->where('sleeve', '!=', '')->groupBy('sleeve')->get();
+        $sleeveArray = array_flatten(json_decode(json_encode($sleeveArray), true));
+
+        $patternArray = Product::select('pattern')->where('pattern', '!=', '')->groupBy('pattern')->get();
+        $patternArray = array_flatten(json_decode(json_encode($patternArray), true));
+
+        $sizeArray = ProductsAttribute::select('size')->groupBy('size')->get();
+        $sizeArray = array_flatten(json_decode(json_encode($sizeArray), true));
         $meta_title = $categoryDetails->meta_title;
         $meta_description = $categoryDetails->meta_description;
         $meta_keywords = $categoryDetails->meta_keywords;
 
-        return view('products.listing', compact('categories', 'categoryDetails', 'products', 'meta_title', 'meta_description', 'meta_keywords', 'url'));
+        return view('products.listing', compact('categories', 'categoryDetails', 'products', 'meta_title', 'meta_description', 'meta_keywords', 'url', 'colorArray', 'sleeveArray','patternArray', 'sizeArray'));
     }
 
     public function filter(Request $request)
@@ -435,7 +487,44 @@ class ProductController extends Controller
                 
             }
         }
-        $finalUrl = "products/".$request->url."?".$colorUrl;
+
+        $sleeveUrl = '';
+        if(!empty($request->sleeveFilter)){
+            foreach($request->sleeveFilter as $sleeve){
+                if(empty($sleeveUrl)){
+                    $sleeveUrl = "&sleeve=".$sleeve;
+                } else {
+                    $sleeveUrl .= "-".$sleeve;
+                }
+                
+            }
+        }
+
+        $patternUrl = '';
+        if(!empty($request->patternFilter)){
+            foreach($request->patternFilter as $pattern){
+                if(empty($patternUrl)){
+                    $patternUrl = "&pattern=".$pattern;
+                } else {
+                    $patternUrl .= "-".$pattern;
+                }
+                
+            }
+        }
+
+        $sizeUrl = '';
+        if(!empty($request->sizeFilter)){
+            foreach($request->sizeFilter as $size){
+                if(empty($sizeUrl)){
+                    $sizeUrl = "&size=".$size;
+                } else {
+                    $sizeUrl .= "-".$size;
+                }
+                
+            }
+        }
+
+        $finalUrl = "products/".$request->url."?".$colorUrl.$sleeveUrl.$patternUrl.$sizeUrl;
         return redirect::to($finalUrl);
     }
 

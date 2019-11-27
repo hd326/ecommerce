@@ -36,13 +36,13 @@
                                 <label class="control-label">Under Category:</label>
                                 <div class="controls">
                                     <select name="category_id" id="category_id" style="width: 220px;">
-                                        <?php //echo $categories_dropdown ?> 
+                                        <?php //echo $categories_dropdown ?>
                                         <option value="" selected disabled>Select</option>
                                         @foreach($categories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                            @foreach($category->categories as $subcategory)
-                                            <option value="{{ $subcategory->id }}">-- {{ $subcategory->name }}</option>
-                                            @endforeach
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        @foreach($category->categories as $subcategory)
+                                        <option value="{{ $subcategory->id }}">-- {{ $subcategory->name }}</option>
+                                        @endforeach
                                         @endforeach
                                     </select>
                                 </div>
@@ -77,6 +77,31 @@
                                     <textarea name="care" id="care"></textarea>
                                 </div>
                             </div>
+                            <div class="control-group">
+                                <label class="control-label">Sleeve:</label>
+                                <div class="controls">
+                                    <select name="sleeve" id="sleeve" style="width:220px">
+                                        <option value="">Select</option>
+                                        <option value="Full Sleeve">Full Sleeve</option>
+                                        <option value="Half Sleeve">Half Sleeve</option>
+                                        <option value="Short Sleeve">Short Sleeve</option>
+                                        <option value="Sleeveless">Sleeveless</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                    <label class="control-label">Pattern:</label>
+                                    <div class="controls">
+                                        <select name="pattern" id="pattern" style="width:220px">
+                                            <option value="">Select</option>
+                                            <option value="Checked">Checked</option>
+                                            <option value="Plain">Plain</option>
+                                            <option value="Printed">Printed</option>
+                                            <option value="Self">Self</option>
+                                            <option value="Solid">Solid</option>
+                                        </select>
+                                    </div>
+                                </div>
                             <div class="control-group">
                                 <label class="control-label">Price:</label>
                                 <div class="controls">

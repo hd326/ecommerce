@@ -91,6 +91,30 @@
             </div>
         </div>
         <div class="control-group">
+                <label class="control-label">Sleeve:</label>
+                <div class="controls">
+                    <select name="sleeve" id="sleeve" style="width:220px">
+                        <option value="">Select</option>
+                        <option value="Full Sleeve" @if(!empty($product->sleeve) && $product->sleeve == "Full Sleeve") selected @endif>Full Sleeve</option>
+                        <option value="Half Sleeve" @if(!empty($product->sleeve) && $product->sleeve == "Half Sleeve") selected @endif>Half Sleeve</option>
+                        <option value="Short Sleeve" @if(!empty($product->sleeve) && $product->sleeve == "Short Sleeve") selected @endif>Short Sleeve</option>
+                        <option value="Sleeveless" @if(!empty($product->sleeve) && $product->sleeve == "Sleeveless") selected @endif>Sleeveless</option>
+                    </select>
+                </div>
+            </div>
+            <div class="control-group">
+                    <label class="control-label">Pattern:</label>
+                    <div class="controls">
+                        <select name="pattern" id="pattern" style="width:220px">
+                            <option value="">Select</option>
+                            <option value="Checked" @if(!empty($product->pattern) && $product->pattern == "Checked") selected @endif>Checked</option>
+                            <option value="Plain" @if(!empty($product->pattern) && $product->pattern == "Plain") selected @endif>Plain</option>
+                            <option value="Printed" @if(!empty($product->pattern) && $product->pattern == "Printed") selected @endif>Printed</option>
+                            <option value="Self" @if(!empty($product->pattern) && $product->pattern == "Self") selected @endif>Self</option>
+                            <option value="Solid" @if(!empty($product->pattern) && $product->pattern == "Solid") selected @endif>Solid</option>
+                        </select>
+                    </div>
+        <div class="control-group">
             <label class="control-label">Product Price:</label>
             <div class="controls">
                 <input type="text" name="price" id="name" value="{{ $product->price }}">

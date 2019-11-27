@@ -70,6 +70,12 @@
                                 <h2>{{ $product->product_name }}</h2>
                                 <p>Code: {{ $product->product_code}}</p>
                                 <p>Color: {{ $product->product_color }}</p>
+                                @if(!empty($product->sleeve))
+                                <p>Sleeve: {{ $product->sleeve }}</p>
+                                @endif
+                                @if(!empty($product->pattern))
+                                <p>Sleeve: {{ $product->pattern }}</p>
+                                @endif
                                 <p>
                                     <select id="selSize" name="size" style="width: 150px;">
                                         <option value="">Select size</option>
